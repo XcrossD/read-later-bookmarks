@@ -1,0 +1,19 @@
+{
+  "name": "Read Later Bookmarks",
+  "description": "Turn bookmarks into read later reader",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": [
+    "bookmarks"
+  ],
+  "action": {
+    "default_title": "Click to add page to read later bookmarks",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "chrome_url_overrides": {
+    "bookmarks": "bookmarks/build/index.html"
+  }
+}
