@@ -3,6 +3,8 @@ import { TrieNode, TrieTree } from '../data/trie';
 
 interface SidebarProps {
   data: null | TrieTree
+  activeFolderId: string
+  handleFolderChange(nodeId: string): void
 }
 
 const Sidebar = (props: SidebarProps) => {
@@ -11,7 +13,14 @@ const Sidebar = (props: SidebarProps) => {
   const dumpFolder = (node: TrieNode) => {
     return (
       <React.Fragment>
-        <li><a>{node.title}</a></li>
+        <li>
+          <a
+            className={props.activeFolderId === node.id ? "is-active" : ""} 
+            onClick={() => { props.handleFolderChange(node.id); }}
+          >
+            {node.title}
+          </a>
+        </li>
         {node.children && (
           <li>
             <ul>

@@ -8,6 +8,7 @@ import {TrieTree} from './data/trie';
 
 function App() {
   const [tree, setTree] = useState<null|TrieTree>(null);
+  const [activeFolderId, setActiveFolderId] = useState<string>("1");
 
   useEffect(() => {
     chrome.bookmarks.getTree((treeArr) => {
@@ -16,12 +17,22 @@ function App() {
       setTree(trie);
     });
   });
+
+  const handleFolderChange = (nodeId: string) => {
+    setActiveFolderId(nodeId);
+  }
   
   return (
     <div className="App">
       <div className="columns">
-        <Sidebar data={tree} />
-        <OriginalBookmarks data={tree} />
+        <Sidebar
+          data={tree}
+          activeFolderId={activeFolderId}
+          handleFolderChange={handleFolderChange}
+        />
+        <OriginalBookmarks
+          data={tree}
+        />
       </div>
     </div>
   );
