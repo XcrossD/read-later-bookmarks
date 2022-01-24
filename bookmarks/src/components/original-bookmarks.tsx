@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import {TrieTree, TrieNode} from '../data/trie';
 
-const OriginalBookmarks = () => {
-  const [tree, setTree] = useState([] as chrome.bookmarks.BookmarkTreeNode[])
+interface OriginalBookmarksProps {
+  data: null | TrieTree
+}
 
-  useEffect(() => {
-    chrome.bookmarks.getTree((treeNode) => {
-      setTree(treeNode)
-    });
-  });
-
+const OriginalBookmarks = (props: OriginalBookmarksProps) => {
   const dumpBookmarks = () => {
     return (
       <nav className="panel">
@@ -20,31 +17,32 @@ const OriginalBookmarks = () => {
             </span>
           </p>
         </div>
-        {tree.map((node) => {
-          return dumpNode(node)
+        {props.data?.root?.children?.map(elem => {
+          return dumpNode(elem);
         })}
       </nav>
     );
   }
 
-  const dumpNode = (node: chrome.bookmarks.BookmarkTreeNode) => {
-    if (node.title != "") {
+  const dumpNode = (node: TrieNode) => {
+    if (node.isPage) {
       return (
-        <React.Fragment>
-          <a className="panel-block" href={node.url} target="_blank">
-            <span className="panel-icon">
-              <i className="fas fa-book" aria-hidden="true"></i>
-            </span>
-            {node.title}
-          </a>
-          {node.children?.map((node) => {
-            return dumpNode(node)
-          })}
-        </React.Fragment>
+        <a className="panel-block" href={node.url} target="_blank">
+          <span className="panel-icon">
+            <i className="fas fa-book" aria-hidden="true"></i>
+          </span>
+          {node.title}
+        </a>
       );
     } else {
       return (
         <React.Fragment>
+          <a className="panel-block">
+            <span className="panel-icon">
+              <i className="fas fa-folder" aria-hidden="true"></i>
+            </span>
+            {node.title}
+          </a>
           {node.children?.map((node) => {
             return dumpNode(node);
           })}
