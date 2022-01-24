@@ -20,7 +20,7 @@ function App() {
   return (
     <div className="App">
       <div className="columns">
-        <Sidebar />
+        <Sidebar data={tree} />
         <OriginalBookmarks data={tree} />
       </div>
     </div>

@@ -1,40 +1,38 @@
 import React from 'react';
+import { TrieNode, TrieTree } from '../data/trie';
 
-const Sidebar = () => {
-  return (
-    <div className="column">
-      <aside className="menu">
-        <p className="menu-label">
-          General
-        </p>
-        <ul className="menu-list">
-          <li><a>Dashboard</a></li>
-          <li><a>Customers</a></li>
-        </ul>
-        <p className="menu-label">
-          Administration
-        </p>
-        <ul className="menu-list">
-          <li><a>Team Settings</a></li>
+interface SidebarProps {
+  data: null | TrieTree
+}
+
+const Sidebar = (props: SidebarProps) => {
+  const rootNode = props.data?.root;
+
+  const dumpFolder = (node: TrieNode) => {
+    return (
+      <React.Fragment>
+        <li><a>{node.title}</a></li>
+        {node.children && (
           <li>
-            <a className="is-active">Manage Your Team</a>
             <ul>
-              <li><a>Members</a></li>
-              <li><a>Plugins</a></li>
-              <li><a>Add a member</a></li>
+              {node.children?.filter(elem => !elem.isPage).map(elem => {
+                return dumpFolder(elem);
+              })} 
             </ul>
           </li>
-          <li><a>Invitations</a></li>
-          <li><a>Cloud Storage Environment Settings</a></li>
-          <li><a>Authentication</a></li>
-        </ul>
+        )}
+      </React.Fragment>
+    )
+  }
+  
+  return (
+    <div className="column is-one-quarter">
+      <aside className="menu">
         <p className="menu-label">
-          Transactions
+          Bookmarks
         </p>
         <ul className="menu-list">
-          <li><a>Payments</a></li>
-          <li><a>Transfers</a></li>
-          <li><a>Balance</a></li>
+          {rootNode?.children?.map(elem => dumpFolder(elem))}
         </ul>
       </aside>
     </div>
