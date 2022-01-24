@@ -3,10 +3,12 @@ import {TrieTree, TrieNode} from '../data/trie';
 
 interface OriginalBookmarksProps {
   data: null | TrieTree
+  activeFolderId: string
+  handleFolderChange(nodeId: string): void
 }
 
 const OriginalBookmarks = (props: OriginalBookmarksProps) => {
-  const dumpBookmarks = () => {
+  const dumpBookmarks = (node: TrieNode | null | undefined) => {
     return (
       <nav className="panel">
         <div className="panel-block">
@@ -17,7 +19,7 @@ const OriginalBookmarks = (props: OriginalBookmarksProps) => {
             </span>
           </p>
         </div>
-        {props.data?.root?.children?.map(elem => {
+        {node?.children?.map(elem => {
           return dumpNode(elem);
         })}
       </nav>
@@ -37,7 +39,10 @@ const OriginalBookmarks = (props: OriginalBookmarksProps) => {
     } else {
       return (
         <React.Fragment>
-          <a className="panel-block">
+          <a
+            className="panel-block"
+            onClick={() => { props.handleFolderChange(node.id) }}
+          >
             <span className="panel-icon">
               <i className="fas fa-folder" aria-hidden="true"></i>
             </span>
@@ -50,10 +55,12 @@ const OriginalBookmarks = (props: OriginalBookmarksProps) => {
       ); 
     }
   }
+
+  const startingBookmark = props.data?.search(props.activeFolderId);
   
   return (
     <div className="column">
-      {dumpBookmarks()}
+      {dumpBookmarks(startingBookmark)}
     </div>
   );
 }

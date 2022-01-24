@@ -32,6 +32,8 @@ function App() {
         />
         <OriginalBookmarks
           data={tree}
+          activeFolderId={activeFolderId}
+          handleFolderChange={handleFolderChange}
         />
       </div>
     </div>

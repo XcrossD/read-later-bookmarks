@@ -36,7 +36,7 @@ class TrieTree {
     this.root = null;
   }
 
-  createNode(obj: chrome.bookmarks.BookmarkTreeNode){
+  createNode(obj: chrome.bookmarks.BookmarkTreeNode) {
     const node = new TrieNode(obj);
     if (obj.children) {
       for (const elem of obj.children) {
@@ -46,7 +46,7 @@ class TrieTree {
     return node;
   }
   
-  populate(arr: chrome.bookmarks.BookmarkTreeNode[]){
+  populate(arr: chrome.bookmarks.BookmarkTreeNode[]) {
     const rootNode = arr[0];
     this.root = new TrieNode(rootNode);
     if (rootNode.children) {
@@ -54,6 +54,24 @@ class TrieTree {
         this.root.addChild(this.createNode(elem));
       }
     }
+  }
+
+  search(id: string) {
+    const queue = [this.root];
+    while (queue.length > 0) {
+      const currNode = queue.shift();
+      if (currNode?.id === id) {
+        return currNode;
+      }
+      if (currNode?.children) {
+        for (const elem of currNode.children) {
+          if (!elem?.isPage) {
+            queue.push(elem);
+          }
+        }
+      }
+    }
+    return null;
   }
 }
 
