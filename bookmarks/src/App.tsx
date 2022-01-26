@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import '../node_modules/@fortawesome/fontawesome-free/css/all.css';
+import Box from '@mui/material/Box';
 import Sidebar from './components/sidebar';
 import OriginalBookmarks from './components/original-bookmarks';
 import {TrieTree} from './data/trie';
@@ -24,18 +25,18 @@ function App() {
   
   return (
     <div className="App">
-      <div className="columns">
+      <Box sx={{ display: 'flex' }}>
         <Sidebar
           data={tree}
           activeFolderId={activeFolderId}
           handleFolderChange={handleFolderChange}
         />
-        <OriginalBookmarks
+        {/* <OriginalBookmarks
           data={tree}
           activeFolderId={activeFolderId}
           handleFolderChange={handleFolderChange}
-        />
-      </div>
+        /> */}
+      </Box>
     </div>
   );
 }
