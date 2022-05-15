@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import FolderIcon from '@mui/icons-material/Folder';
+import WebIcon from '@mui/icons-material/Web';
 
 import {TrieTree, TrieNode} from '../data/trie';
 import { Grid } from '@mui/material';
@@ -15,7 +15,6 @@ import { Grid } from '@mui/material';
 interface BookmarksProps {
   data: null | TrieTree
   activeFolderId: string
-  handleFolderChange(nodeId: string): void
 }
 
 const Search = styled('div')(({ theme }) => ({
@@ -59,6 +58,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const Bookmarks = (props: BookmarksProps) => {
+  const [activeNodeId, setActiveNodeId] = useState<string>("1");
+
   const handlePageClick = (event: React.MouseEvent<HTMLInputElement>, url: string) => {
     window.open(url);
   };
@@ -95,29 +96,23 @@ const Bookmarks = (props: BookmarksProps) => {
     if (node.isPage) {
       return (
         <ListItemButton
-          selected={props.activeFolderId === node.id}
-          onClick={(event) => props.handleFolderChange(node.id)}
+          selected={activeNodeId === node.id}
+          onClick={() => setActiveNodeId(node.id)}
         >
           <ListItemIcon>
-            <FolderIcon />
+            <WebIcon />
           </ListItemIcon>
           <ListItemText
             primary={node.title}
           />
         </ListItemButton>
-        // <a className="panel-block" href={node.url} target="_blank">
-        //   <span className="panel-icon">
-        //     <i className="fas fa-book" aria-hidden="true"></i>
-        //   </span>
-        //   {node.title}
-        // </a>
       );
     } else {
       return (
         <React.Fragment>
           <ListItemButton
-            selected={props.activeFolderId === node.id}
-            onClick={(event) => props.handleFolderChange(node.id)}
+            selected={activeNodeId === node.id}
+            onClick={() => setActiveNodeId(node.id)}
           >
             <ListItemIcon>
               <FolderIcon />
@@ -126,24 +121,10 @@ const Bookmarks = (props: BookmarksProps) => {
               primary={node.title}
             />
           </ListItemButton>
-          {node.children?.map((node) => {
+          {/* {node.children?.map((node) => {
             return dumpNode(node);
-          })}
+          })} */}
         </React.Fragment>
-        // <React.Fragment>
-        //   <a
-        //     className="panel-block"
-        //     onClick={() => { props.handleFolderChange(node.id) }}
-        //   >
-        //     <span className="panel-icon">
-        //       <i className="fas fa-folder" aria-hidden="true"></i>
-        //     </span>
-        //     {node.title}
-        //   </a>
-        //   {node.children?.map((node) => {
-        //     return dumpNode(node);
-        //   })}
-        // </React.Fragment>
       ); 
     }
   }

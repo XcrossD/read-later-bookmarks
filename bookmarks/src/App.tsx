@@ -17,6 +17,8 @@ function App() {
     chrome.bookmarks.getTree((treeArr) => {
       const trie = new TrieTree();
       trie.populate(treeArr);
+      console.log("treeArr", treeArr);
+      console.log("trie", trie);
       setTree(trie);
     });
   });
@@ -29,7 +31,7 @@ function App() {
     <div className="App">
       <Box sx={{ display: 'flex' }}>
         <Grid container spacing={2}>
-          <Grid item xs={4}>
+          <Grid item xs={2}>
             <Sidebar
               data={tree}
               activeFolderId={activeFolderId}
@@ -40,8 +42,10 @@ function App() {
             <Bookmarks
               data={tree}
               activeFolderId={activeFolderId}
-              handleFolderChange={handleFolderChange}
             />
+          </Grid>
+          <Grid item xs={2}>
+
           </Grid>
         </Grid>
         
