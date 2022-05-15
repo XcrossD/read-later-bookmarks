@@ -3,7 +3,9 @@ import logo from './logo.svg';
 import './App.css';
 import '../node_modules/@fortawesome/fontawesome-free/css/all.css';
 import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 import Sidebar from './components/sidebar';
+import Bookmarks from './components/bookmarks';
 import OriginalBookmarks from './components/original-bookmarks';
 import {TrieTree} from './data/trie';
 
@@ -26,11 +28,23 @@ function App() {
   return (
     <div className="App">
       <Box sx={{ display: 'flex' }}>
-        <Sidebar
-          data={tree}
-          activeFolderId={activeFolderId}
-          handleFolderChange={handleFolderChange}
-        />
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <Sidebar
+              data={tree}
+              activeFolderId={activeFolderId}
+              handleFolderChange={handleFolderChange}
+            />
+          </Grid>
+          <Grid item xs={8}>
+            <Bookmarks
+              data={tree}
+              activeFolderId={activeFolderId}
+              handleFolderChange={handleFolderChange}
+            />
+          </Grid>
+        </Grid>
+        
         {/* <OriginalBookmarks
           data={tree}
           activeFolderId={activeFolderId}
