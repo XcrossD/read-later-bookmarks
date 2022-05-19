@@ -14,14 +14,17 @@ function App() {
   const [activeFolderId, setActiveFolderId] = useState<string>("1");
 
   useEffect(() => {
-    chrome.bookmarks.getTree((treeArr) => {
+    const fetchTreeData = async () => {
+      const treeArr = await chrome.bookmarks.getTree();
       const trie = new TrieTree();
       trie.populate(treeArr);
       console.log("treeArr", treeArr);
       console.log("trie", trie);
       setTree(trie);
-    });
-  });
+    };
+    fetchTreeData()
+      .catch(console.error);
+  }, []);
 
   const handleFolderChange = (nodeId: string) => {
     setActiveFolderId(nodeId);
