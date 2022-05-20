@@ -5,6 +5,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import FolderIcon from '@mui/icons-material/Folder';
 import ExpandLess from '@mui/icons-material/ExpandLess';
@@ -19,13 +21,44 @@ interface FolderProps {
   activeFolderId: string;
 }
 
+interface ContextMenu {
+  mouseX: number;
+  mouseY: number;
+}
+
 const Folder = (props: FolderProps) => {
   const [open, setOpen] = useState<boolean>(true);
+  const [contextMenu, setContextMenu] = React.useState<null|ContextMenu>(null);
 
   let containsSubfolder = !props.node.children?.every(elem => elem.isPage);
   if (!props.node.children || props.node.children?.length === 0) {
     containsSubfolder = false;
   }
+
+  const handleClick = (e: React.MouseEvent, nodeId: string) => {
+    if (e.type === 'click') {
+      console.log('Left click');
+      props.handleFolderChange(nodeId);
+    } else if (e.type === 'contextmenu') {
+      console.log('Right click');
+      e.preventDefault();
+      setContextMenu(
+        contextMenu === null
+          ? {
+              mouseX: e.clientX + 2,
+              mouseY: e.clientY - 6,
+            }
+          : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
+            // Other native context menus might behave different.
+            // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+            null,
+      );
+    }
+  }
+
+  const handleClose = () => {
+    setContextMenu(null);
+  };
 
   return (
     <React.Fragment>
@@ -56,6 +89,12 @@ const Folder = (props: FolderProps) => {
       >
         <ListItemButton 
           selected={props.activeFolderId === props.node.id}
+          onClick={(e) => {
+            handleClick(e, props.node.id);
+          }}
+          onContextMenu={(e) => {
+            handleClick(e, props.node.id);
+          }}
           sx={{
             pl: 2 + props.level * 2
           }}
@@ -66,6 +105,21 @@ const Folder = (props: FolderProps) => {
           <ListItemText primary={props.node.title} />
         </ListItemButton>
       </ListItem>
+      <Menu
+        open={contextMenu !== null}
+        onClose={handleClose}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
+        }
+      >
+        <MenuItem onClick={handleClose}>Copy</MenuItem>
+        <MenuItem onClick={handleClose}>Print</MenuItem>
+        <MenuItem onClick={handleClose}>Highlight</MenuItem>
+        <MenuItem onClick={handleClose}>Email</MenuItem>
+      </Menu>
       {containsSubfolder && (
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
