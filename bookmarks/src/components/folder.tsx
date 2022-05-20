@@ -5,14 +5,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
 import FolderIcon from '@mui/icons-material/Folder';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import IconButton from '@mui/material/IconButton';
 import { TrieNode, TrieTree } from '../data/trie';
+import FolderContextMenu from './folder-context-menu';
 
 interface FolderProps {
   node: TrieNode;
@@ -24,6 +22,11 @@ interface FolderProps {
 interface ContextMenu {
   mouseX: number;
   mouseY: number;
+}
+
+export interface AnchorPosition {
+  top: number;
+  left: number;
 }
 
 const Folder = (props: FolderProps) => {
@@ -105,21 +108,15 @@ const Folder = (props: FolderProps) => {
           <ListItemText primary={props.node.title} />
         </ListItemButton>
       </ListItem>
-      <Menu
+      <FolderContextMenu
         open={contextMenu !== null}
-        onClose={handleClose}
-        anchorReference="anchorPosition"
+        handleClose={handleClose}
         anchorPosition={
           contextMenu !== null
             ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
             : undefined
         }
-      >
-        <MenuItem onClick={handleClose}>Copy</MenuItem>
-        <MenuItem onClick={handleClose}>Print</MenuItem>
-        <MenuItem onClick={handleClose}>Highlight</MenuItem>
-        <MenuItem onClick={handleClose}>Email</MenuItem>
-      </Menu>
+      />
       {containsSubfolder && (
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
