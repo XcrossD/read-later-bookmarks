@@ -1,24 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
+import styled from "styled-components";
 import logo from './logo.svg';
 import './App.css';
+import {
+  Divider,
+  ButtonGroup,
+  Button
+} from '@blueprintjs/core';
 
-function App() {
+const Container = styled.div`
+  min-width: 300px;
+  min-height: 300px;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+`;
+
+const SaveStateDisplay = styled.div`
+  display: flex;
+`;
+
+const OptionsDisplay = styled.div`
+  display: flex;
+`;
+
+const App = () => {
+  const [pageInBookmarks, setPageInBookmarks] = useState<boolean>(false);
+  
+  const openReadLaterView = () => {
+    chrome.tabs.create({ 'url': 'bookmarks/build/index.html'})
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Container>
+        <SaveStateDisplay>
+          
+        </SaveStateDisplay>
+        <Divider />
+        <ButtonGroup style={{ minWidth: 200 }}>
+          <Button
+            icon="page-layout"
+            onClick={openReadLaterView}
+          >
+            Open read later view
+          </Button>
+          <Button icon="cog">Options</Button>
+        </ButtonGroup>
+      </Container>
     </div>
   );
 }
