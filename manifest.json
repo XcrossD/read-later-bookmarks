@@ -8,12 +8,9 @@
   ],
   "action": {
     "default_title": "Click to add page to read later bookmarks",
-    "default_popup": "popup.html"
+    "default_popup": "popup/build/index.html"
   },
   "background": {
     "service_worker": "background.js"
-  },
-  "chrome_url_overrides": {
-    "bookmarks": "bookmarks/build/index.html"
   }
 }
