@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+.base-card {
+  min-width: 300px;
+}
+
+.save-button-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-group {
+  margin-top: 10px;
+}

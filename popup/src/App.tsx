@@ -3,19 +3,14 @@ import styled from "styled-components";
 import logo from './logo.svg';
 import './App.css';
 import {
+  Card,
   Divider,
   ButtonGroup,
-  Button
+  Button,
+  H3,
+  H5
 } from '@blueprintjs/core';
 import { url } from 'inspector';
-
-const Container = styled.div`
-  min-width: 300px;
-  min-height: 300px;
-  padding: 1em;
-  display: flex;
-  flex-direction: column;
-`;
 
 const SaveStateDisplay = styled.div`
   display: flex;
@@ -89,17 +84,19 @@ const App = () => {
 
   return (
     <div className="App">
-      <Container>
+      <Card className="base-card">
         <SaveStateDisplay>
           {
             pageInBookmarks ?
-            <h2>Saved</h2> :
-            <h2>Not saved</h2>
+            <H3>Saved</H3> :
+            <H3>Not saved</H3>
           }
-          <a href="" onClick={(e) => handleBookmarkAction(e)}>{pageInBookmarks ? 'Remove' : 'Save'}</a>
+          <H5 className="save-button-wrapper">
+            <a href="" onClick={(e) => handleBookmarkAction(e)}>{pageInBookmarks ? 'Remove' : 'Save'}</a>
+          </H5>
         </SaveStateDisplay>
         <Divider />
-        <ButtonGroup style={{ minWidth: 200 }}>
+        <ButtonGroup className="button-group">
           <Button
             icon="page-layout"
             onClick={openReadLaterView}
@@ -108,7 +105,7 @@ const App = () => {
           </Button>
           <Button icon="cog">Options</Button>
         </ButtonGroup>
-      </Container>
+      </Card>
     </div>
   );
 }
