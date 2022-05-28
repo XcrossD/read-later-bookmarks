@@ -30,11 +30,21 @@ const App = () => {
   const [loading, setLoading] = useState<boolean>(false);
   
   useEffect(() => {
-    const findBookmark = async () => {
+    const findOrCreateReadLaterFolder = async () => {
+      const readLaterFolderSearchResult = await chrome.bookmarks.search("Read Later Bookmarks");
+      let readLaterFolder = null;
+      if (readLaterFolderSearchResult.length > 0) {
+        readLaterFolder = readLaterFolderSearchResult[0];
+      } else {
+        readLaterFolder = await chrome.bookmarks.create({ title: "Read Later Bookmarks" });
+      }
+      return readLaterFolder;
+    };
+    
+    const findBookmark = async (folder: chrome.bookmarks.BookmarkTreeNode) => {
       const currTabs = await chrome.tabs.query({active: true, lastFocusedWindow: true});
       const currTabUrl = currTabs[0].url as string;
-      const bookmarks = await chrome.bookmarks.search(currTabUrl);
-      console.log(bookmarks);
+      const bookmarks = await chrome.bookmarks.search({ url: currTabUrl });
       if (bookmarks.length > 0) {
         setPageInBookmarks(true);
       } else {
@@ -42,7 +52,8 @@ const App = () => {
       }
     };
 
-    findBookmark()
+    findOrCreateReadLaterFolder()
+      .then(res => findBookmark(res))
       .catch(console.error);
   }, []);
 

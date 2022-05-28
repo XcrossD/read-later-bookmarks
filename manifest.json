@@ -4,7 +4,8 @@
   "version": "1.0",
   "manifest_version": 3,
   "permissions": [
-    "bookmarks"
+    "bookmarks",
+    "tabs"
   ],
   "action": {
     "default_title": "Click to add page to read later bookmarks",
