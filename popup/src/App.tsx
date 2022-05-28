@@ -79,7 +79,7 @@ const App = () => {
   };
   
   const openReadLaterView = () => {
-    chrome.tabs.create({ 'url': 'bookmarks/build/index.html'})
+    chrome.tabs.create({ 'url': 'readlater/build/index.html'})
   };
 
   return (
