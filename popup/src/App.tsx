@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from "styled-components";
 import logo from './logo.svg';
 import './App.css';
@@ -7,6 +7,7 @@ import {
   ButtonGroup,
   Button
 } from '@blueprintjs/core';
+import { url } from 'inspector';
 
 const Container = styled.div`
   min-width: 300px;
@@ -30,18 +31,7 @@ const App = () => {
   const [loading, setLoading] = useState<boolean>(false);
   
   useEffect(() => {
-    const findOrCreateReadLaterFolder = async () => {
-      const readLaterFolderSearchResult = await chrome.bookmarks.search("Read Later Bookmarks");
-      let readLaterFolder = null;
-      if (readLaterFolderSearchResult.length > 0) {
-        readLaterFolder = readLaterFolderSearchResult[0];
-      } else {
-        readLaterFolder = await chrome.bookmarks.create({ title: "Read Later Bookmarks" });
-      }
-      return readLaterFolder;
-    };
-    
-    const findBookmark = async (folder: chrome.bookmarks.BookmarkTreeNode) => {
+    const findBookmark = async () => {
       const currTabs = await chrome.tabs.query({active: true, lastFocusedWindow: true});
       const currTabUrl = currTabs[0].url as string;
       const bookmarks = await chrome.bookmarks.search({ url: currTabUrl });
@@ -52,13 +42,45 @@ const App = () => {
       }
     };
 
-    findOrCreateReadLaterFolder()
-      .then(res => findBookmark(res))
+    findBookmark()
       .catch(console.error);
   }, []);
 
-  const handleBookmarkAction = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+  const handleBookmarkAction = async (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault();
+    const findOrCreateReadLaterFolder = async () => {
+      const readLaterFolderSearchResult = await chrome.bookmarks.search("Read Later Bookmarks");
+      let readLaterFolder = null;
+      if (readLaterFolderSearchResult.length > 0) {
+        readLaterFolder = readLaterFolderSearchResult[0];
+      } else {
+        readLaterFolder = await chrome.bookmarks.create({ title: "Read Later Bookmarks" });
+      }
+      return readLaterFolder
+    };
+
+    const findCurrentTab = async () => {
+      const currTabs = await chrome.tabs.query({active: true, lastFocusedWindow: true});
+      return currTabs[0];
+    }
+
+    const findCurrentTabBookmark = async (tab: chrome.tabs.Tab) => {
+      const bookmarks = await chrome.bookmarks.search({ url: tab.url });
+      return bookmarks[0];
+    }
+
+    const currTab = await findCurrentTab();
+    if (pageInBookmarks) {
+      const currTabBookmark = await findCurrentTabBookmark(currTab);
+      chrome.bookmarks.remove(currTabBookmark.id, () => setPageInBookmarks(false));
+    } else {
+      let readLaterFolder = await findOrCreateReadLaterFolder();
+      chrome.bookmarks.create({
+        parentId: readLaterFolder.id,
+        title: currTab.title,
+        url: currTab.url
+      }, () => {setPageInBookmarks(true)});
+    }
   };
   
   const openReadLaterView = () => {
