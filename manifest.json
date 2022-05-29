@@ -7,6 +7,9 @@
     "bookmarks",
     "tabs"
   ],
+  "host_permissions": [
+    "*://*/*"
+  ],
   "action": {
     "default_title": "Click to add page to read later bookmarks",
     "default_popup": "popup/build/index.html"
