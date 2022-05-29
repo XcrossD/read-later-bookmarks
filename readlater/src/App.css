@@ -8,7 +8,7 @@
 
 .bookmark-wrapper {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: 1.5em;
   margin-top: 1.5em;
 }
@@ -18,4 +18,18 @@
   width: 100%;
   height: 200px;
   background-size: cover;
+}
+
+.truncate {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;  
+}
+
+.bookmark-card-title {
+  height: calc(3em + 10px);
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  max-width: 100%;
 }
