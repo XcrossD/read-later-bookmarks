@@ -36,3 +36,16 @@
     transform: rotate(360deg);
   }
 }
+
+.container {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  max-width: 1100px;
+  min-height: 100vh;
+}
+
+.bookmark-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
