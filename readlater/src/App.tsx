@@ -22,7 +22,7 @@ import Bookmarks from './components/bookmarks';
 let readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null = null;
 
 function App() {
-  const [newestFirst, setNewestFirst] = useState<boolean>(true);
+  const [newestFirst, setNewestFirst] = useState<boolean>(false);
   const [bookmarks, setBookmarks] = useState<Array<chrome.bookmarks.BookmarkTreeNode>>([]);
 
   const refreshBookmarks = () => {
@@ -55,6 +55,12 @@ function App() {
       })
       .catch(console.error);
   }, []);
+
+  useEffect(() => {
+    const newBookmarks = [...bookmarks];
+    newBookmarks.sort((a, b) => newestFirst ? b.dateAdded! - a.dateAdded! : a.dateAdded! - b.dateAdded!);
+    setBookmarks(newBookmarks);
+  }, [newestFirst]);
 
   return (
     <div className="App">

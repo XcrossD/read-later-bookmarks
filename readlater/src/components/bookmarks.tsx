@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import moment from 'moment';
 import { Button, ButtonGroup, Card, Classes, H5 } from '@blueprintjs/core';
 
 interface BookmarksProps {
@@ -66,12 +67,15 @@ const Bookmarks = (props: BookmarksProps) => {
   return (
     <div className="bookmark-wrapper">
       {props.bookmarks.map((elem, index) => {
+        const dateAdded = moment(elem.dateAdded);
         return (
           <Card>
             <img
               className={bookmarkMetas.length === 0 ? Classes.SKELETON : "bookmark-card-image"}
               src={bookmarkMetas.length === 0 ? 'https://picsum.photos/200' : bookmarkMetas[index].image || 'https://picsum.photos/200'}
+              alt={'Thumbnail'}
             />
+            <p>{dateAdded.format('MMM Do YYYY, h:mm:ss a')}</p>
             <div className="truncate">
               <H5 className="bookmark-card-title">
                 <a href={elem.url}>{elem.title}</a>
