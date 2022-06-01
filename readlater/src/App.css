@@ -26,10 +26,12 @@
   -webkit-box-orient: vertical;
   overflow: hidden;  
   margin-bottom: 10px;
+  font-size: 16px;
+  line-height: 19px;
+  height: calc(3em + 10px);
 }
 
 .bookmark-card-title {
-  height: calc(3em + 10px);
   text-overflow: ellipsis;
   word-wrap: break-word;
   max-width: 100%;
