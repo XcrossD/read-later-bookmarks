@@ -23,12 +23,19 @@ let readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null = null;
 
 function App() {
   const [newestFirst, setNewestFirst] = useState<boolean>(false);
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [bookmarks, setBookmarks] = useState<Array<chrome.bookmarks.BookmarkTreeNode>>([]);
 
   const refreshBookmarks = () => {
     const getBookmarks = async (folderId: string) => {
-      const folderChildrenResult = await chrome.bookmarks.getChildren(folderId);
+      let folderChildrenResult = await chrome.bookmarks.getChildren(folderId);
       folderChildrenResult.sort((a, b) => newestFirst ? b.dateAdded! - a.dateAdded! : a.dateAdded! - b.dateAdded!);
+      if (searchKeyword.length > 0) {
+        folderChildrenResult = folderChildrenResult.filter((elem) => {
+          return elem.title.toLowerCase().includes(searchKeyword) ||
+            elem.url?.toLowerCase().includes(searchKeyword);
+        });
+      }
       console.log(folderChildrenResult);
       setBookmarks(folderChildrenResult);
     };
@@ -37,11 +44,28 @@ function App() {
     }
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(e.target.value.toLowerCase());
+  };
+
+  const handleSearchClear = () => {
+    setSearchKeyword('');
+  }
+
   const sortMenu = (
     <Menu>
       <MenuItem icon="sort-asc" text="Oldest first" onClick={() => setNewestFirst(false)}/>
       <MenuItem icon="sort-desc" text="Newest first" onClick={() => setNewestFirst(true)}/>
     </Menu>
+  );
+
+  const searchClear = (
+    <Button
+      className={Classes.MINIMAL}
+      icon="cross"
+      onClick={handleSearchClear}
+      minimal
+    />
   );
 
   useEffect(() => {
@@ -86,10 +110,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const newBookmarks = [...bookmarks];
-    newBookmarks.sort((a, b) => newestFirst ? b.dateAdded! - a.dateAdded! : a.dateAdded! - b.dateAdded!);
-    setBookmarks(newBookmarks);
-  }, [newestFirst]);
+    refreshBookmarks();
+  }, [newestFirst, searchKeyword]);
 
   return (
     <div className="App">
@@ -101,6 +123,9 @@ function App() {
               <InputGroup
                   leftIcon="search"
                   placeholder="Search bookmarks"
+                  onChange={handleSearchChange}
+                  rightElement={searchKeyword.length > 0 ? searchClear : undefined}
+                  value={searchKeyword}
               />
             </ControlGroup>
           </NavbarGroup>
