@@ -20,10 +20,10 @@ const Bookmarks = (props: BookmarksProps) => {
   const [bookmarkMetas, setBookmarkMetas] = useState<Array<meta>>([]);
 
   useEffect(() => {
-    const promiseArr = props.bookmarks.filter(elem => elem.url)
-      .map((elem: chrome.bookmarks.BookmarkTreeNode) => {
-        return fetch(elem.url as string);
-      });
+    const bookmarksCopy = props.bookmarks.filter(elem => elem.url);
+    const promiseArr = bookmarksCopy.map((elem: chrome.bookmarks.BookmarkTreeNode) => {
+      return fetch(elem.url as string);
+    });
     Promise.all(promiseArr)
       .then((responses) => Promise.all(responses.map(res => res.text())))
       .then((responseTexts) => {
@@ -48,11 +48,13 @@ const Bookmarks = (props: BookmarksProps) => {
           return metaObj;
         });
         setBookmarkMetas(metas);
-      });
+      })
+      .catch(console.error);
   }, [props.bookmarks]);
 
-  const handleArchive = () => {
-
+  const handleArchive = (id: string) => {
+    // chrome.bookmarks.getTree((result) => console.log(result));
+    chrome.bookmarks.move(id, { parentId: '2' }, () => props.refreshBookmarks());
   };
 
   const handleShare = () => {
@@ -60,19 +62,19 @@ const Bookmarks = (props: BookmarksProps) => {
   };
 
   const handleDelete = (id: string) => {
-    chrome.bookmarks.remove(id);
-    props.refreshBookmarks();
+    chrome.bookmarks.remove(id, () => props.refreshBookmarks());
   };
 
   return (
     <div className="bookmark-wrapper">
       {props.bookmarks.map((elem, index) => {
-        const dateAdded = moment(elem.dateAdded);
+        const dateAdded = moment(elem.dateAdded),
+          metaLoaded = bookmarkMetas.length === props.bookmarks.length;
         return (
           <Card>
             <img
-              className={bookmarkMetas.length === 0 ? Classes.SKELETON : "bookmark-card-image"}
-              src={bookmarkMetas.length === 0 ? 'https://picsum.photos/200' : bookmarkMetas[index].image || 'https://picsum.photos/200'}
+              className={metaLoaded ? "bookmark-card-image" : Classes.SKELETON}
+              src={metaLoaded ? bookmarkMetas[index].image || 'https://picsum.photos/200' : 'https://picsum.photos/200'}
               alt={'Thumbnail'}
             />
             <p>{dateAdded.format('MMM Do YYYY, h:mm:ss a')}</p>
@@ -85,7 +87,7 @@ const Bookmarks = (props: BookmarksProps) => {
               <Button
                 icon="archive"
                 className={Classes.BUTTON}
-                onClick={handleArchive}
+                onClick={() => handleArchive(elem.id)}
               />
               <Button
                 icon="export"
