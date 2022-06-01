@@ -12,11 +12,11 @@ import {
   Menu,
   MenuItem
 } from '@blueprintjs/core';
+import { Popover2 } from "@blueprintjs/popover2";
 import 'normalize.css/normalize.css';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import './App.css';
-import ControlBar from './components/controlbar';
 import Bookmarks from './components/bookmarks';
 
 let readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null = null;
@@ -36,6 +36,13 @@ function App() {
       getBookmarks(readLaterFolder.id);
     }
   };
+
+  const sortMenu = (
+    <Menu>
+      <MenuItem icon="sort-asc" text="Oldest first" onClick={() => setNewestFirst(false)}/>
+      <MenuItem icon="sort-desc" text="Newest first" onClick={() => setNewestFirst(true)}/>
+    </Menu>
+  );
 
   useEffect(() => {
     const findOrCreateReadLaterFolder = async () => {
@@ -87,11 +94,23 @@ function App() {
   return (
     <div className="App">
       <div className="container">
-        <ControlBar
-          newestFirst={newestFirst}
-          setNewestFirst={setNewestFirst}
-          readLaterFolder={readLaterFolder}
-        />
+        <Navbar>
+          <NavbarGroup align={Alignment.LEFT}>
+            <NavbarHeading>Read Later Bookmarks</NavbarHeading>
+            <ControlGroup>
+              <InputGroup
+                  leftIcon="search"
+                  placeholder="Search bookmarks"
+              />
+            </ControlGroup>
+          </NavbarGroup>
+          <NavbarGroup align={Alignment.RIGHT}>
+            {/* <Button className={Classes.MINIMAL} icon="document" text="Tag" /> */}
+            <Popover2 content={sortMenu} placement="auto">
+              <Button className={Classes.MINIMAL} icon={newestFirst ? "sort-desc" : "sort-asc"} text="Sort" />
+            </Popover2>
+          </NavbarGroup>
+        </Navbar>
         <Bookmarks
           readLaterFolder={readLaterFolder}
           bookmarks={bookmarks}
