@@ -54,6 +54,27 @@ function App() {
         refreshBookmarks();
       })
       .catch(console.error);
+
+      chrome.bookmarks.onChanged.addListener(() => {
+        console.log("chrome.bookmarks.onChanged fired");
+        refreshBookmarks();
+      });
+      chrome.bookmarks.onChildrenReordered.addListener(() => {
+        console.log("chrome.bookmarks.onChildrenReordered fired");
+        refreshBookmarks();
+      });
+      chrome.bookmarks.onCreated.addListener(() => {
+        console.log("chrome.bookmarks.onCreated fired");
+        refreshBookmarks();
+      });
+      chrome.bookmarks.onMoved.addListener(() => {
+        console.log("chrome.bookmarks.onMoved fired");
+        refreshBookmarks();
+      });
+      chrome.bookmarks.onRemoved.addListener(() => {
+        console.log("chrome.bookmarks.onRemoved fired");
+        refreshBookmarks();
+      });
   }, []);
 
   useEffect(() => {
