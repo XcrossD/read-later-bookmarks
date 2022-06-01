@@ -25,6 +25,17 @@ function App() {
   const [newestFirst, setNewestFirst] = useState<boolean>(true);
   const [bookmarks, setBookmarks] = useState<Array<chrome.bookmarks.BookmarkTreeNode>>([]);
 
+  const refreshBookmarks = () => {
+    const getBookmarks = async (folderId: string) => {
+      const folderChildrenResult = await chrome.bookmarks.getChildren(folderId);
+      console.log(folderChildrenResult);
+      setBookmarks(folderChildrenResult);
+    };
+    if (readLaterFolder) {
+      getBookmarks(readLaterFolder.id);
+    }
+  };
+
   useEffect(() => {
     const findOrCreateReadLaterFolder = async () => {
       const readLaterFolderSearchResult = await chrome.bookmarks.search("Read Later Bookmarks");
@@ -37,19 +48,14 @@ function App() {
       return readLaterFolder
     };
 
-    const getBookmarks = async (folderId: string) => {
-      const folderChildrenResult = await chrome.bookmarks.getChildren(folderId);
-      console.log(folderChildrenResult);
-      setBookmarks(folderChildrenResult);
-    }
     findOrCreateReadLaterFolder()
       .then(res => {
         readLaterFolder = res;
-        getBookmarks(readLaterFolder.id);
+        refreshBookmarks();
       })
-      .catch(console.error)
+      .catch(console.error);
   }, []);
-  
+
   return (
     <div className="App">
       <div className="container">
@@ -61,6 +67,8 @@ function App() {
         <Bookmarks
           readLaterFolder={readLaterFolder}
           bookmarks={bookmarks}
+          setBookmarks={setBookmarks}
+          refreshBookmarks={refreshBookmarks}
         />
       </div>
     </div>

@@ -4,6 +4,8 @@ import { Button, ButtonGroup, Card, Classes, H5 } from '@blueprintjs/core';
 interface BookmarksProps {
   readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null;
   bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>;
+  setBookmarks(bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>): void;
+  refreshBookmarks(): void;
 }
 
 interface meta {
@@ -46,7 +48,20 @@ const Bookmarks = (props: BookmarksProps) => {
         });
         setBookmarkMetas(metas);
       });
-  }, [props.bookmarks])
+  }, [props.bookmarks]);
+
+  const handleArchive = () => {
+
+  };
+
+  const handleShare = () => {
+
+  };
+
+  const handleDelete = (id: string) => {
+    chrome.bookmarks.remove(id);
+    props.refreshBookmarks();
+  };
 
   return (
     <div className="bookmark-wrapper">
@@ -63,9 +78,21 @@ const Bookmarks = (props: BookmarksProps) => {
               </H5>
             </div>
             <ButtonGroup>
-              <Button icon="archive" className={Classes.BUTTON} />
-              <Button icon="social-media" className={Classes.BUTTON} />
-              <Button icon="trash" className={Classes.BUTTON} />
+              <Button
+                icon="archive"
+                className={Classes.BUTTON}
+                onClick={handleArchive}
+              />
+              <Button
+                icon="export"
+                className={Classes.BUTTON}
+                onClick={handleShare}
+              />
+              <Button
+                icon="trash"
+                className={Classes.BUTTON}
+                onClick={() => handleDelete(elem.id)}  
+              />
             </ButtonGroup>
           </Card>
         );
