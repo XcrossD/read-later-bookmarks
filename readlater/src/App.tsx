@@ -28,6 +28,7 @@ function App() {
   const refreshBookmarks = () => {
     const getBookmarks = async (folderId: string) => {
       const folderChildrenResult = await chrome.bookmarks.getChildren(folderId);
+      folderChildrenResult.sort((a, b) => newestFirst ? b.dateAdded! - a.dateAdded! : a.dateAdded! - b.dateAdded!);
       console.log(folderChildrenResult);
       setBookmarks(folderChildrenResult);
     };
