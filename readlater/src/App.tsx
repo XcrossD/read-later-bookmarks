@@ -12,6 +12,8 @@ import {
   Menu,
   MenuItem,
   IToastProps,
+  Toaster,
+  Position,
 } from '@blueprintjs/core';
 import { Popover2 } from "@blueprintjs/popover2";
 import 'normalize.css/normalize.css';
@@ -19,7 +21,6 @@ import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import './App.css';
 import Bookmarks from './components/bookmarks';
-import { ToasterDelete } from './components/toaster';
 
 let readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null = null;
 
@@ -27,6 +28,8 @@ function App() {
   const [newestFirst, setNewestFirst] = useState<boolean>(false);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [bookmarks, setBookmarks] = useState<Array<chrome.bookmarks.BookmarkTreeNode>>([]);
+
+  const toaster = useRef(null);
 
   const refreshBookmarks = () => {
     const getBookmarks = async (folderId: string) => {
@@ -52,12 +55,6 @@ function App() {
 
   const handleSearchClear = () => {
     setSearchKeyword('');
-  }
-
-  const showToast = (toastObj: IToastProps) => {
-    // create toasts in response to interactions.
-    // in most cases, it's enough to simply create and forget (thanks to timeout).
-    ToasterDelete.show(toastObj);
   }
 
   const sortMenu = (
@@ -149,9 +146,10 @@ function App() {
           bookmarks={bookmarks}
           setBookmarks={setBookmarks}
           refreshBookmarks={refreshBookmarks}
-          showToast={showToast}
+          toaster={toaster.current}
         />
       </div>
+      <Toaster position={Position.BOTTOM_LEFT} ref={toaster} />
     </div>
   );
 }

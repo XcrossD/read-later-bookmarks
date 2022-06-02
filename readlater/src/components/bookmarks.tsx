@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
-import { Button, ButtonGroup, Card, Classes, H5, IToastProps } from '@blueprintjs/core';
+import { Button, ButtonGroup, Card, Classes, H5, IToastProps, Toaster } from '@blueprintjs/core';
 
 interface BookmarksProps {
   readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null;
   bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>;
   setBookmarks(bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>): void;
   refreshBookmarks(): void;
-  showToast(toastObj: IToastProps): void;
+  toaster: Toaster | null;
 }
 
 interface meta {
@@ -21,6 +21,7 @@ const Bookmarks = (props: BookmarksProps) => {
   const [bookmarkMetas, setBookmarkMetas] = useState<Array<meta>>([]);
 
   useEffect(() => {
+    console.log('toaster', props.toaster);
     const bookmarksCopy = props.bookmarks.filter(elem => elem.url);
     const promiseArr = bookmarksCopy.map((elem: chrome.bookmarks.BookmarkTreeNode) => {
       return fetch(elem.url as string);
@@ -53,6 +54,10 @@ const Bookmarks = (props: BookmarksProps) => {
       .catch(console.error);
   }, [props.bookmarks]);
 
+  const addToast = (toast: IToastProps) => {
+    props.toaster?.show(toast);
+  }
+
   const handleArchive = (id: string) => {
     // chrome.bookmarks.getTree((result) => console.log(result));
     chrome.bookmarks.move(id, { parentId: '2' }, () => props.refreshBookmarks());
@@ -65,10 +70,19 @@ const Bookmarks = (props: BookmarksProps) => {
   const handleDelete = (node: chrome.bookmarks.BookmarkTreeNode) => {
     chrome.bookmarks.remove(node.id, () => {
       props.refreshBookmarks();
-      props.showToast({
-        message: 'Bookmark deleted',
-        timeout: 0
-      })
+      addToast({
+        message: `'${node.title}' deleted`,
+        action: {
+          onClick: () => {
+            chrome.bookmarks.create({
+              parentId: props.readLaterFolder?.id,
+              title: node.title,
+              url: node.url
+            });
+          },
+          text: "Undo",
+        }
+      } as IToastProps)
     });
   };
 
