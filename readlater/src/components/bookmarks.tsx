@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
-import { Button, ButtonGroup, Card, Classes, H5 } from '@blueprintjs/core';
+import { Button, ButtonGroup, Card, Classes, H5, IToastProps } from '@blueprintjs/core';
 
 interface BookmarksProps {
   readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null;
   bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>;
   setBookmarks(bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>): void;
   refreshBookmarks(): void;
+  showToast(toastObj: IToastProps): void;
 }
 
 interface meta {
@@ -61,8 +62,14 @@ const Bookmarks = (props: BookmarksProps) => {
 
   };
 
-  const handleDelete = (id: string) => {
-    chrome.bookmarks.remove(id, () => props.refreshBookmarks());
+  const handleDelete = (node: chrome.bookmarks.BookmarkTreeNode) => {
+    chrome.bookmarks.remove(node.id, () => {
+      props.refreshBookmarks();
+      props.showToast({
+        message: 'Bookmark deleted',
+        timeout: 0
+      })
+    });
   };
 
   return (
@@ -97,7 +104,7 @@ const Bookmarks = (props: BookmarksProps) => {
               <Button
                 icon="trash"
                 className={Classes.BUTTON}
-                onClick={() => handleDelete(elem.id)}  
+                onClick={() => handleDelete(elem)}  
               />
             </ButtonGroup>
           </Card>

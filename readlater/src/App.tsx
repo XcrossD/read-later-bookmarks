@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from "styled-components";
 import {
   Button,
@@ -10,7 +10,8 @@ import {
   Alignment,
   Classes,
   Menu,
-  MenuItem
+  MenuItem,
+  IToastProps,
 } from '@blueprintjs/core';
 import { Popover2 } from "@blueprintjs/popover2";
 import 'normalize.css/normalize.css';
@@ -18,6 +19,7 @@ import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import './App.css';
 import Bookmarks from './components/bookmarks';
+import { ToasterDelete } from './components/toaster';
 
 let readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null = null;
 
@@ -50,6 +52,12 @@ function App() {
 
   const handleSearchClear = () => {
     setSearchKeyword('');
+  }
+
+  const showToast = (toastObj: IToastProps) => {
+    // create toasts in response to interactions.
+    // in most cases, it's enough to simply create and forget (thanks to timeout).
+    ToasterDelete.show(toastObj);
   }
 
   const sortMenu = (
@@ -141,6 +149,7 @@ function App() {
           bookmarks={bookmarks}
           setBookmarks={setBookmarks}
           refreshBookmarks={refreshBookmarks}
+          showToast={showToast}
         />
       </div>
     </div>
