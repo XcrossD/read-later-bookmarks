@@ -60,7 +60,24 @@ const Bookmarks = (props: BookmarksProps) => {
 
   const handleArchive = (id: string) => {
     // chrome.bookmarks.getTree((result) => console.log(result));
-    chrome.bookmarks.move(id, { parentId: '2' }, () => props.refreshBookmarks());
+    chrome.bookmarks.move(id,
+      { parentId: '2' },
+      (result: chrome.bookmarks.BookmarkTreeNode) => {
+        props.refreshBookmarks();
+        addToast({
+          message: `'${result.title}' archived`,
+          action: {
+            onClick: () => {
+              chrome.bookmarks.move(result.id,
+                { parentId: props.readLaterFolder?.id },
+                () => props.refreshBookmarks()
+              );
+            },
+            text: "Undo",
+          }
+        } as IToastProps)
+      }
+    );
   };
 
   const handleShare = () => {
