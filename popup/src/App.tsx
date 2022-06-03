@@ -81,8 +81,12 @@ const App = () => {
   };
   
   const openReadLaterView = () => {
-    chrome.tabs.create({ 'url': 'readlater/build/index.html'})
+    chrome.tabs.create({ 'url': 'readlater/build/index.html'});
   };
+
+  const openOptionsPage = () => {
+    chrome.runtime.openOptionsPage();
+  }
 
   return (
     <div className="App">
@@ -105,7 +109,12 @@ const App = () => {
           >
             Open read later view
           </Button>
-          <Button icon="cog">Options</Button>
+          <Button
+            icon="cog"
+            onClick={openOptionsPage}
+          >
+            Options
+          </Button>
         </ButtonGroup>
       </Card>
     </div>

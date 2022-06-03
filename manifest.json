@@ -5,7 +5,8 @@
   "manifest_version": 3,
   "permissions": [
     "bookmarks",
-    "tabs"
+    "tabs",
+    "storage"
   ],
   "host_permissions": [
     "*://*/*"
@@ -16,5 +17,6 @@
   },
   "background": {
     "service_worker": "background.js"
-  }
+  },
+  "options_page": "options/build/index.html"
 }
