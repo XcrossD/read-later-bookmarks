@@ -21,7 +21,6 @@ const Bookmarks = (props: BookmarksProps) => {
   const [bookmarkMetas, setBookmarkMetas] = useState<Array<meta>>([]);
 
   useEffect(() => {
-    console.log('toaster', props.toaster);
     const bookmarksCopy = props.bookmarks.filter(elem => elem.url);
     const promiseArr = bookmarksCopy.map((elem: chrome.bookmarks.BookmarkTreeNode) => {
       return fetch(elem.url as string);

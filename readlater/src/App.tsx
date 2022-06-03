@@ -11,7 +11,6 @@ import {
   Classes,
   Menu,
   MenuItem,
-  IToastProps,
   Toaster,
   Position,
 } from '@blueprintjs/core';
