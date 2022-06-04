@@ -14,6 +14,12 @@ const DEFAULT_SETTINGS = {
   actionOnBookmarkClicked: 'none'
 };
 
+const OPEN_ACTIONS = [
+  { label: 'None', value: 'none' },
+  { label: 'Delete bookmark after viewing', value: 'delete' },
+  { label: 'Archive bookmark after viewing', value: 'archive' }
+];
+
 function App() {
   const [defaultArchiveFolder, setDefaultArchiveFolder] = useState<chrome.bookmarks.BookmarkTreeNode | null>(null);
   const [openBookmarkInNewTab, setOpenBookmarkInNewTab] = useState<boolean>(false);
@@ -65,10 +71,17 @@ function App() {
       openBookmarkInNewTab: !openBookmarkInNewTab,
     });
   }
+
+  const handlePostActionChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
+    const action = e.currentTarget.value;
+    chrome.storage.local.set({
+      actionOnBookmarkClicked: action,
+    });
+  }
   
   return (
     <div className="App">
-      <H1>General Settings</H1>
+      <H1 className="title">General Settings</H1>
       <FormGroup
         disabled={false}
         inline={true}
@@ -90,6 +103,17 @@ function App() {
         <Switch
           checked={openBookmarkInNewTab}
           onChange={handleNewTabChange}
+        />
+      </FormGroup>
+      <FormGroup
+        disabled={false}
+        inline={true}
+        label="Action to perform after viewing bookmark"
+      >
+        <HTMLSelect
+          options={OPEN_ACTIONS}
+          value={actionOnBookmarkClicked}
+          onChange={handlePostActionChange}  
         />
       </FormGroup>
     </div>
