@@ -32,7 +32,7 @@ function App() {
     }
     
     chrome.storage.local.get(Object.keys(DEFAULT_SETTINGS), function(result) {
-      console.log("storage get result", result);
+      // console.log("storage get result", result);
       if (Object.keys(result).length === 0) {
         chrome.storage.local.set(DEFAULT_SETTINGS, function() {
           getAndSetFolder(DEFAULT_SETTINGS.defaultArchiveId);
@@ -47,7 +47,7 @@ function App() {
     });
 
     chrome.storage.onChanged.addListener((changes) => {
-      console.log("changes", changes);
+      // console.log("changes", changes);
       for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
         switch(key) {
           case 'defaultArchiveId':
