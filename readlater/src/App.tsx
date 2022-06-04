@@ -21,8 +21,10 @@ import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
 import './App.css';
 import Bookmarks from './components/bookmarks';
+import { IOptions, DEFAULT_SETTINGS } from '../../options/src/App';
 
 let readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null = null;
+let options: IOptions | null = null;
 
 function App() {
   const [newestFirst, setNewestFirst] = useState<boolean>(false);
@@ -92,26 +94,37 @@ function App() {
       })
       .catch(console.error);
 
-      chrome.bookmarks.onChanged.addListener(() => {
-        console.log("chrome.bookmarks.onChanged fired");
-        refreshBookmarks();
-      });
-      chrome.bookmarks.onChildrenReordered.addListener(() => {
-        console.log("chrome.bookmarks.onChildrenReordered fired");
-        refreshBookmarks();
-      });
-      chrome.bookmarks.onCreated.addListener(() => {
-        console.log("chrome.bookmarks.onCreated fired");
-        refreshBookmarks();
-      });
-      chrome.bookmarks.onMoved.addListener(() => {
-        console.log("chrome.bookmarks.onMoved fired");
-        refreshBookmarks();
-      });
-      chrome.bookmarks.onRemoved.addListener(() => {
-        console.log("chrome.bookmarks.onRemoved fired");
-        refreshBookmarks();
-      });
+    chrome.storage.local.get(Object.keys(DEFAULT_SETTINGS), (result) => {
+      options = {...result} as IOptions;
+    });
+
+    chrome.bookmarks.onChanged.addListener(() => {
+      console.log("chrome.bookmarks.onChanged fired");
+      refreshBookmarks();
+    });
+    chrome.bookmarks.onChildrenReordered.addListener(() => {
+      console.log("chrome.bookmarks.onChildrenReordered fired");
+      refreshBookmarks();
+    });
+    chrome.bookmarks.onCreated.addListener(() => {
+      console.log("chrome.bookmarks.onCreated fired");
+      refreshBookmarks();
+    });
+    chrome.bookmarks.onMoved.addListener(() => {
+      console.log("chrome.bookmarks.onMoved fired");
+      refreshBookmarks();
+    });
+    chrome.bookmarks.onRemoved.addListener(() => {
+      console.log("chrome.bookmarks.onRemoved fired");
+      refreshBookmarks();
+    });
+    chrome.storage.onChanged.addListener((changes) => {
+      for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+        if (options) {
+          options[key] = newValue;
+        }
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -147,6 +160,7 @@ function App() {
           setBookmarks={setBookmarks}
           refreshBookmarks={refreshBookmarks}
           toaster={toaster.current}
+          options={options}
         />
       </div>
       <Toaster position={Position.BOTTOM_LEFT} ref={toaster} />

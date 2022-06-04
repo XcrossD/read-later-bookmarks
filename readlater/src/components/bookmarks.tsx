@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { Button, ButtonGroup, Card, Classes, H5, IToastProps, Toaster } from '@blueprintjs/core';
+import { IOptions } from '../../../options/src/App';
 
 interface BookmarksProps {
   readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null;
@@ -8,6 +9,7 @@ interface BookmarksProps {
   setBookmarks(bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>): void;
   refreshBookmarks(): void;
   toaster: Toaster | null;
+  options: IOptions | null;
 }
 
 interface meta {
@@ -60,7 +62,7 @@ const Bookmarks = (props: BookmarksProps) => {
   const handleArchive = (id: string) => {
     // chrome.bookmarks.getTree((result) => console.log(result));
     chrome.bookmarks.move(id,
-      { parentId: '2' },
+      { parentId: props.options?.defaultArchiveId },
       (result: chrome.bookmarks.BookmarkTreeNode) => {
         props.refreshBookmarks();
         addToast({
@@ -109,15 +111,17 @@ const Bookmarks = (props: BookmarksProps) => {
           metaLoaded = bookmarkMetas.length === props.bookmarks.length;
         return (
           <Card>
-            <img
-              className={metaLoaded ? "bookmark-card-image" : Classes.SKELETON}
-              src={metaLoaded ? bookmarkMetas[index].image || 'https://picsum.photos/200' : 'https://picsum.photos/200'}
-              alt={'Thumbnail'}
-            />
+            <a href={elem.url} target={props.options?.openBookmarkInNewTab ? "_blank" : "_self"}>
+              <img
+                className={metaLoaded ? "bookmark-card-image" : Classes.SKELETON}
+                src={metaLoaded ? bookmarkMetas[index].image || 'https://picsum.photos/200' : 'https://picsum.photos/200'}
+                alt={'Thumbnail'}
+              />
+            </a>
             <p>{dateAdded.format('MMM Do YYYY, h:mm:ss a')}</p>
             <div className="truncate">
               <H5 className="bookmark-card-title">
-                <a href={elem.url}>{elem.title}</a>
+                <a href={elem.url} target={props.options?.openBookmarkInNewTab ? "_blank" : "_self"}>{elem.title}</a>
               </H5>
             </div>
             <ButtonGroup>

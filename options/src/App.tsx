@@ -8,7 +8,14 @@ import "@blueprintjs/popover2/lib/css/blueprint-popover2.css"
 import './App.css';
 import * as Folder from './components/folder'
 
-const DEFAULT_SETTINGS = {
+export type IOptions = {
+  [key: string]: any;
+  defaultArchiveId: string;
+  openBookmarkInNewTab: boolean;
+  actionOnBookmarkClicked: string;
+};
+
+export const DEFAULT_SETTINGS = {
   defaultArchiveId: '1',
   openBookmarkInNewTab: false,
   actionOnBookmarkClicked: 'none'
@@ -63,7 +70,7 @@ function App() {
             break;
         }
       }
-    })
+    });
   }, []);
 
   const handleNewTabChange = () => {
