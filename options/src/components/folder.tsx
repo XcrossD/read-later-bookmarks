@@ -118,6 +118,11 @@ export const TreeFolder = (props: TreeFolderProps) => {
             payload: { path: nodePath, isSelected: originallySelected == null ? true : !originallySelected },
             type: "SET_IS_SELECTED",
         });
+        chrome.storage.local.set({
+          preference: {
+            defaultArchiveId: node.id
+          }
+        });
     },
     [],
   );

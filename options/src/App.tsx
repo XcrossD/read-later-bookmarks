@@ -25,24 +25,28 @@ function App() {
           }
         }, function() {
           getAndSetFolder('1');
-        })
+        });
       } else {
         getAndSetFolder(result.key.defaultArchiveId);
       }
     });
+
+    chrome.storage.onChanged.addListener((changes) => {
+      getAndSetFolder(changes.preference.newValue.defaultArchiveId);
+    })
   }, []);
   
   return (
     <div className="App">
       <H1>General Settings</H1>
       <div className="option">
-        <Label>Default archive location</Label>
+        <span className="option-label">Default archive location</span>
         <Popover2
           enforceFocus={false}
           placement="bottom-start"
           content={<Folder.TreeFolder defaultArchiveId={defaultArchiveFolder?.id} />}
         >
-          <Button text={"default"} tabIndex={0} rightIcon="double-caret-vertical" />
+          <Button text={defaultArchiveFolder?.title} tabIndex={0} rightIcon="double-caret-vertical" />
         </Popover2>
       </div>
     </div>
