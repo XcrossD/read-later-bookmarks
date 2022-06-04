@@ -33,7 +33,7 @@ function App() {
     
     chrome.storage.local.get(Object.keys(DEFAULT_SETTINGS), function(result) {
       console.log("storage get result", result);
-      if (Object.keys({}).length === 0) {
+      if (Object.keys(result).length === 0) {
         chrome.storage.local.set(DEFAULT_SETTINGS, function() {
           getAndSetFolder(DEFAULT_SETTINGS.defaultArchiveId);
           setOpenBookmarkInNewTab(DEFAULT_SETTINGS.openBookmarkInNewTab);
