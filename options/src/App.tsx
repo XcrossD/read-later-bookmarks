@@ -82,16 +82,6 @@ function App() {
           <Button text={defaultArchiveFolder?.title} tabIndex={0} rightIcon="double-caret-vertical" />
         </Popover2>
       </FormGroup>
-      {/* <div className="option">
-        <span className="option-label">Default archive location</span>
-        <Popover2
-          enforceFocus={false}
-          placement="bottom-start"
-          content={<Folder.TreeFolder defaultArchiveId={defaultArchiveFolder?.id} />}
-        >
-          <Button text={defaultArchiveFolder?.title} tabIndex={0} rightIcon="double-caret-vertical" />
-        </Popover2>
-      </div> */}
       <FormGroup
         disabled={false}
         inline={true}
