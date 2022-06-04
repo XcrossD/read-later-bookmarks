@@ -18,6 +18,7 @@ import { Popover2 } from "@blueprintjs/popover2";
 import 'normalize.css/normalize.css';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
+import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
 import './App.css';
 import Bookmarks from './components/bookmarks';
 
