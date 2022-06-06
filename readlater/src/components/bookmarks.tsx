@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
-import { Button, ButtonGroup, Card, Classes, H5, IToastProps, Toaster } from '@blueprintjs/core';
+import { Button, ButtonGroup, Card, Classes, H5, IToastProps, NonIdealState, Toaster } from '@blueprintjs/core';
 // import { IOptions } from '../../../options/src/App';
 import { IOptions } from '../App';
 
 interface BookmarksProps {
   readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null;
+  searchKeyword: string;
   bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>;
   setBookmarks(bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>): void;
   refreshBookmarks(): void;
@@ -170,6 +171,18 @@ const Bookmarks = (props: BookmarksProps) => {
           </Card>
         );
       })}
+      {props.bookmarks.length === 0 && (
+        <NonIdealState 
+          className="empty-message"
+          icon={props.searchKeyword.length > 0 ? 'search' : 'book'}
+          title={props.searchKeyword.length > 0 ? "No search results" : "No bookmarks in folder"}
+          description={(
+            <div>
+              {props.searchKeyword.length > 0 ? "Your search didn't match any bookmarks." : "Please add some bookmarks to \"Read Later Bookmarks\" to get started"}
+            </div>
+          )}
+        />
+      )}
     </div>
   )
 }

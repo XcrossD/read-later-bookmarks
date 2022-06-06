@@ -178,6 +178,7 @@ function App() {
         </Navbar>
         <Bookmarks
           readLaterFolder={readLaterFolder}
+          searchKeyword={searchKeyword}
           bookmarks={bookmarks}
           setBookmarks={setBookmarks}
           refreshBookmarks={refreshBookmarks}
