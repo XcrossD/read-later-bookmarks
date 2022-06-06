@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { Button, ButtonGroup, Card, Classes, H5, IToastProps, Toaster } from '@blueprintjs/core';
-import { IOptions } from '../../../options/src/App';
+// import { IOptions } from '../../../options/src/App';
+import { IOptions } from '../App';
 
 interface BookmarksProps {
   readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null;
@@ -59,6 +60,21 @@ const Bookmarks = (props: BookmarksProps) => {
     props.toaster?.show(toast);
   }
 
+  const handleLinkClick = (e: React.MouseEvent, node: chrome.bookmarks.BookmarkTreeNode) => {
+    switch(props.options?.actionOnBookmarkClicked) {
+      case 'archive':
+        handleArchive(node.id);
+        break;
+      case 'delete':
+        handleDelete(node);
+        break;
+      case 'none':
+      default:
+        break;
+    }
+    return true;
+  }
+
   const handleArchive = (id: string) => {
     // chrome.bookmarks.getTree((result) => console.log(result));
     chrome.bookmarks.move(id,
@@ -111,7 +127,11 @@ const Bookmarks = (props: BookmarksProps) => {
           metaLoaded = bookmarkMetas.length === props.bookmarks.length;
         return (
           <Card>
-            <a href={elem.url} target={props.options?.openBookmarkInNewTab ? "_blank" : "_self"}>
+            <a
+              href={elem.url}
+              target={props.options?.openBookmarkInNewTab ? "_blank" : "_self"}
+              onClick={(e) => handleLinkClick(e, elem)}
+            >
               <img
                 className={metaLoaded ? "bookmark-card-image" : Classes.SKELETON}
                 src={metaLoaded ? bookmarkMetas[index].image || 'https://picsum.photos/200' : 'https://picsum.photos/200'}
@@ -121,7 +141,13 @@ const Bookmarks = (props: BookmarksProps) => {
             <p>{dateAdded.format('MMM Do YYYY, h:mm:ss a')}</p>
             <div className="truncate">
               <H5 className="bookmark-card-title">
-                <a href={elem.url} target={props.options?.openBookmarkInNewTab ? "_blank" : "_self"}>{elem.title}</a>
+                <a
+                  href={elem.url}
+                  target={props.options?.openBookmarkInNewTab ? "_blank" : "_self"}
+                  onClick={(e) => handleLinkClick(e, elem)}
+                >
+                  {elem.title}
+                </a>
               </H5>
             </div>
             <ButtonGroup>

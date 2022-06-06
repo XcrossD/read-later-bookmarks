@@ -21,15 +21,29 @@ import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
 import './App.css';
 import Bookmarks from './components/bookmarks';
-import { IOptions, DEFAULT_SETTINGS } from '../../options/src/App';
+// import { IOptions, DEFAULT_SETTINGS } from '../../options/src/App';
+
+// need to find a way to make single source of truth
+export type IOptions = {
+  [key: string]: any;
+  defaultArchiveId: string;
+  openBookmarkInNewTab: boolean;
+  actionOnBookmarkClicked: string;
+};
+
+export const DEFAULT_SETTINGS = {
+  defaultArchiveId: '1',
+  openBookmarkInNewTab: false,
+  actionOnBookmarkClicked: 'none'
+};
 
 let readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null = null;
-let options: IOptions | null = null;
 
 function App() {
   const [newestFirst, setNewestFirst] = useState<boolean>(false);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [bookmarks, setBookmarks] = useState<Array<chrome.bookmarks.BookmarkTreeNode>>([]);
+  const [options, setOptions] = useState<IOptions | null>(null);
 
   const toaster = useRef(null);
 
@@ -43,7 +57,7 @@ function App() {
             elem.url?.toLowerCase().includes(searchKeyword);
         });
       }
-      console.log(folderChildrenResult);
+      // console.log(folderChildrenResult);
       setBookmarks(folderChildrenResult);
     };
     if (readLaterFolder) {
@@ -57,7 +71,7 @@ function App() {
 
   const handleSearchClear = () => {
     setSearchKeyword('');
-  }
+  };
 
   const sortMenu = (
     <Menu>
@@ -95,7 +109,7 @@ function App() {
       .catch(console.error);
 
     chrome.storage.local.get(Object.keys(DEFAULT_SETTINGS), (result) => {
-      options = {...result} as IOptions;
+      setOptions({...result} as IOptions);
     });
 
     chrome.bookmarks.onChanged.addListener(() => {
@@ -118,18 +132,26 @@ function App() {
       console.log("chrome.bookmarks.onRemoved fired");
       refreshBookmarks();
     });
-    chrome.storage.onChanged.addListener((changes) => {
-      for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-        if (options) {
-          options[key] = newValue;
-        }
-      }
-    });
   }, []);
 
   useEffect(() => {
     refreshBookmarks();
   }, [newestFirst, searchKeyword]);
+
+  useEffect(() => {
+    const handleStorageChange = (changes: object) => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+      if (options) {
+        const newOptions = {...options} as IOptions;
+        for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+          newOptions[key] = newValue;
+        }
+        setOptions(newOptions);
+      }
+    };
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+  }, [options]);
 
   return (
     <div className="App">
