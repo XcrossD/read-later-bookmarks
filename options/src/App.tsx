@@ -7,6 +7,7 @@ import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import "@blueprintjs/popover2/lib/css/blueprint-popover2.css"
 import './App.css';
 import * as Folder from './components/folder'
+import ExportSettings from './components/export';
 
 export type IOptions = {
   [key: string]: any;
@@ -123,6 +124,7 @@ function App() {
           onChange={handlePostActionChange}  
         />
       </FormGroup>
+      <ExportSettings />
     </div>
   );
 }
