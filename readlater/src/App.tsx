@@ -21,6 +21,7 @@ import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
 import './App.css';
 import Bookmarks from './components/bookmarks';
+import Nav from './components/navbar';
 // import { IOptions, DEFAULT_SETTINGS } from '../../options/src/App';
 
 // need to find a way to make single source of truth
@@ -44,6 +45,7 @@ function App() {
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [bookmarks, setBookmarks] = useState<Array<chrome.bookmarks.BookmarkTreeNode>>([]);
   const [options, setOptions] = useState<IOptions | null>(null);
+  const [bulkEdit, setBulkEdit] = useState<boolean>(false);
 
   const toaster = useRef(null);
 
@@ -156,26 +158,15 @@ function App() {
   return (
     <div className="App">
       <div className="container">
-        <Navbar>
-          <NavbarGroup align={Alignment.LEFT}>
-            <NavbarHeading>Read Later Bookmarks</NavbarHeading>
-            <ControlGroup>
-              <InputGroup
-                  leftIcon="search"
-                  placeholder="Search bookmarks"
-                  onChange={handleSearchChange}
-                  rightElement={searchKeyword.length > 0 ? searchClear : undefined}
-                  value={searchKeyword}
-              />
-            </ControlGroup>
-          </NavbarGroup>
-          <NavbarGroup align={Alignment.RIGHT}>
-            {/* <Button className={Classes.MINIMAL} icon="document" text="Tag" /> */}
-            <Popover2 content={sortMenu} placement="auto">
-              <Button className={Classes.MINIMAL} icon={newestFirst ? "sort-desc" : "sort-asc"} text="Sort" />
-            </Popover2>
-          </NavbarGroup>
-        </Navbar>
+        <Nav
+          searchKeyword={searchKeyword}
+          setSearchKeyword={setSearchKeyword}
+          newestFirst={newestFirst}
+          setNewestFirst={setNewestFirst}
+          bulkEdit={bulkEdit}
+          setBulkEdit={setBulkEdit}
+          toaster={toaster.current}
+        />
         <Bookmarks
           readLaterFolder={readLaterFolder}
           searchKeyword={searchKeyword}

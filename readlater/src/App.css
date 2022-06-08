@@ -4,6 +4,13 @@
   margin: auto;
   max-width: 1100px;
   min-height: 100vh;
+  padding-top: 50px;
+}
+
+.navbar-fix-top {
+  position: fixed;
+  top: 0;
+  max-width: 1100px;
 }
 
 .bookmark-wrapper {
