@@ -1,5 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import bookmarksReducer from '../features/bookmarks/bookmarksSlice'
+import bookmarkMetasReducer from '../features/bookmarkMetas/bookmarkMetasSlice'
+import optionsReducer from '../features/options/optionsSlice'
 import readLaterFolderReducer from '../features/readLaterFolder/readLaterFolderSlice'
 import searchKeywordReducer from '../features/searchKeyword/searchKeywordSlice'
 
@@ -7,7 +9,9 @@ export const store = configureStore({
   reducer: {
     bookmarks: bookmarksReducer,
     readLaterFolder: readLaterFolderReducer,
-    searchKeyword: searchKeywordReducer
+    searchKeyword: searchKeywordReducer,
+    options: optionsReducer,
+    bookmarkMetas: bookmarkMetasReducer,
   },
 })
 

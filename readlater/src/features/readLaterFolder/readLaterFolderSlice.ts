@@ -26,7 +26,6 @@ const readLaterFolderSlice = createSlice({
       })
       .addCase(fetchreadLaterFolder.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        // Add any fetched posts to the array
         state.readLaterFolder = action.payload;
       })
       .addCase(fetchreadLaterFolder.rejected, (state, action) => {

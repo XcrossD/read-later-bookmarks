@@ -6,12 +6,12 @@ const searchKeywordSlice = createSlice({
     name: 'searchKeyword',
     initialState,
     reducers: {
-      update(state, action) {
-        state = action.payload;
+      updateSearchKeyword(state, action) {
+        return action.payload;
       }
     }
 });
 
-export const { update } = searchKeywordSlice.actions;
+export const { updateSearchKeyword } = searchKeywordSlice.actions;
 
 export default searchKeywordSlice.reducer;

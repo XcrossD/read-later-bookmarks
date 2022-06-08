@@ -10,15 +10,13 @@ import {
   Menu,
   MenuItem,
   Toaster,
-  Position,
   ButtonGroup,
 } from '@blueprintjs/core';
 import { Popover2 } from "@blueprintjs/popover2";
-import { useAppDispatch } from '../app/hooks';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { updateSearchKeyword } from '../features/searchKeyword/searchKeywordSlice';
 
 interface INavProps {
-  searchKeyword: string;
-  setSearchKeyword(s: string): void;
   newestFirst: boolean;
   setNewestFirst(b: boolean): void;
   bulkEdit: boolean;
@@ -28,6 +26,7 @@ interface INavProps {
 
 const Nav = (props: INavProps) => {
   const dispatch = useAppDispatch();
+  const searchKeyword = useAppSelector(state => state.searchKeyword);
 
   const handleArchive = () => {
 
@@ -38,11 +37,11 @@ const Nav = (props: INavProps) => {
   };
   
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    props.setSearchKeyword(e.target.value.toLowerCase());
+    dispatch(updateSearchKeyword(e.target.value.toLowerCase()))
   };
 
   const handleSearchClear = () => {
-    props.setSearchKeyword('');
+    dispatch(updateSearchKeyword(''))
   };
 
   const sortMenu = (
@@ -91,8 +90,8 @@ const Nav = (props: INavProps) => {
                 leftIcon="search"
                 placeholder="Search bookmarks"
                 onChange={handleSearchChange}
-                rightElement={props.searchKeyword.length > 0 ? searchClear : undefined}
-                value={props.searchKeyword}
+                rightElement={searchKeyword.length > 0 ? searchClear : undefined}
+                value={searchKeyword}
             />
           </ControlGroup>
         )}

@@ -1,5 +1,6 @@
 import { createSlice, nanoid, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
+import { fetchBookmarkMetas } from '../bookmarkMetas/bookmarkMetasSlice';
 
 interface BookmarksState {
   bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>;
@@ -26,8 +27,7 @@ const bookmarksSlice = createSlice({
       })
       .addCase(fetchBookmarks.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        // Add any fetched posts to the array
-        state.bookmarks = state.bookmarks.concat(action.payload)
+        state.bookmarks = action.payload;
       })
       .addCase(fetchBookmarks.rejected, (state, action) => {
         state.status = 'failed'
@@ -36,16 +36,17 @@ const bookmarksSlice = createSlice({
   }
 })
 
-export const fetchBookmarks = createAsyncThunk('bookmarks/fetchBookmarks', async (arg, { getState }) => {
+export const fetchBookmarks = createAsyncThunk('bookmarks/fetchBookmarks', async (arg, { dispatch, getState }) => {
   const state = getState() as RootState;
-  console.log(state);
+  // console.log(state);
   if (state.readLaterFolder.readLaterFolder?.id) {
-    const response = await chrome.bookmarks.getChildren(state.readLaterFolder.readLaterFolder.id);
-    return response;
+    const bookmarks = await chrome.bookmarks.getChildren(state.readLaterFolder.readLaterFolder.id);
+    dispatch(fetchBookmarkMetas(bookmarks));
+    return bookmarks;
   } else {
     return [];
   }
-})
+});
 
 export default bookmarksSlice.reducer
 

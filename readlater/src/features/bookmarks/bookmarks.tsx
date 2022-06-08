@@ -1,72 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import React from 'react';
+import { useAppSelector } from '../../app/hooks';
 import moment from 'moment';
 import { Button, ButtonGroup, Card, Classes, H5, IToastProps, NonIdealState, Toaster } from '@blueprintjs/core';
-// import { IOptions } from '../../../options/src/App';
 import { IOptions } from '../../App';
 import { selectAllBookmarks } from './bookmarksSlice';
+import { BookmarkMeta, selectAllBookmarkMetas } from '../bookmarkMetas/bookmarkMetasSlice';
 
 interface BookmarksProps {
-  // readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null;
-  searchKeyword: string;
-  // bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>;
-  // setBookmarks(bookmarks: Array<chrome.bookmarks.BookmarkTreeNode>): void;
-  // refreshBookmarks(): void;
+  newestFirst: boolean;
   toaster: Toaster | null;
-  options: IOptions | null;
 }
-
-interface meta {
-  description: string | null;
-  image: string | null;
-}
-
-const parser = new DOMParser();
 
 const Bookmarks = (props: BookmarksProps) => {
   const bookmarks: Array<chrome.bookmarks.BookmarkTreeNode> = useAppSelector(selectAllBookmarks);
-  const dispatch = useAppDispatch();
-  const [bookmarkMetas, setBookmarkMetas] = useState<Array<meta>>([]);
-
-  // useEffect(() => {
-  //   const bookmarksCopy = props.bookmarks.filter(elem => elem.url);
-  //   const promiseArr = bookmarksCopy.map((elem: chrome.bookmarks.BookmarkTreeNode) => {
-  //     return fetch(elem.url as string);
-  //   });
-  //   Promise.all(promiseArr)
-  //     .then((responses) => Promise.all(responses.map(res => res.text())))
-  //     .then((responseTexts) => {
-  //       const metas = responseTexts.map((text) => {
-  //         const doc = parser.parseFromString(text, "text/html");
-  //         const metatags = doc.getElementsByTagName("meta");
-  //         const metaObj = {
-  //           description: null,
-  //           image: null,
-  //         } as meta;
-  //         for (let i = 0; i < metatags.length; i += 1) {
-  //           if (metatags[i].getAttribute('name') === 'description') {
-  //             metaObj['description'] = metatags[i].getAttribute('content')
-  //           }
-  //           if (metatags[i].getAttribute('name') === 'og:image') {
-  //             metaObj['image'] = metatags[i].getAttribute('content')
-  //           }
-  //           if (metatags[i].getAttribute('name') === 'twitter:image') {
-  //             metaObj['image'] = metatags[i].getAttribute('content')
-  //           }
-  //         }
-  //         return metaObj;
-  //       });
-  //       setBookmarkMetas(metas);
-  //     })
-  //     .catch(console.error);
-  // }, [props.bookmarks]);
+  const bookmarkMetas: Array<BookmarkMeta> = useAppSelector(selectAllBookmarkMetas);
+  const readLaterFolder = useAppSelector(state => state.readLaterFolder.readLaterFolder);
+  const options: IOptions = useAppSelector(state => state.options.options);
+  const searchKeyword: string = useAppSelector(state => state.searchKeyword);
 
   const addToast = (toast: IToastProps) => {
     props.toaster?.show(toast);
   }
 
   const handleLinkClick = (e: React.MouseEvent, node: chrome.bookmarks.BookmarkTreeNode) => {
-    switch(props.options?.actionOnBookmarkClicked) {
+    switch(options.actionOnBookmarkClicked) {
       case 'archive':
         handleArchive(node.id);
         break;
@@ -82,24 +39,22 @@ const Bookmarks = (props: BookmarksProps) => {
 
   const handleArchive = (id: string) => {
     // chrome.bookmarks.getTree((result) => console.log(result));
-    // chrome.bookmarks.move(id,
-    //   { parentId: props.options?.defaultArchiveId },
-    //   (result: chrome.bookmarks.BookmarkTreeNode) => {
-    //     props.refreshBookmarks();
-    //     addToast({
-    //       message: `'${result.title}' archived`,
-    //       action: {
-    //         onClick: () => {
-    //           chrome.bookmarks.move(result.id,
-    //             { parentId: props.readLaterFolder?.id },
-    //             () => props.refreshBookmarks()
-    //           );
-    //         },
-    //         text: "Undo",
-    //       }
-    //     } as IToastProps)
-    //   }
-    // );
+    chrome.bookmarks.move(id,
+      { parentId: options.defaultArchiveId },
+      (result: chrome.bookmarks.BookmarkTreeNode) => {
+        addToast({
+          message: `'${result.title}' archived`,
+          action: {
+            onClick: () => {
+              chrome.bookmarks.move(result.id,
+                { parentId: readLaterFolder?.id }
+              );
+            },
+            text: "Undo",
+          }
+        } as IToastProps)
+      }
+    );
   };
 
   const handleShare = () => {
@@ -107,35 +62,46 @@ const Bookmarks = (props: BookmarksProps) => {
   };
 
   const handleDelete = (node: chrome.bookmarks.BookmarkTreeNode) => {
-    // chrome.bookmarks.remove(node.id, () => {
-    //   props.refreshBookmarks();
-    //   addToast({
-    //     message: `'${node.title}' deleted`,
-    //     action: {
-    //       onClick: () => {
-    //         chrome.bookmarks.create({
-    //           parentId: props.readLaterFolder?.id,
-    //           title: node.title,
-    //           url: node.url
-    //         });
-    //       },
-    //       text: "Undo",
-    //     }
-    //   } as IToastProps)
-    // });
+    chrome.bookmarks.remove(node.id, () => {
+      addToast({
+        message: `'${node.title}' deleted`,
+        action: {
+          onClick: () => {
+            chrome.bookmarks.create({
+              parentId: readLaterFolder?.id,
+              title: node.title,
+              url: node.url
+            });
+          },
+          text: "Undo",
+        }
+      } as IToastProps)
+    });
   };
+
+  const applyChangesToBookmarks = () => {
+    let newBookmarks = [...bookmarks];
+    newBookmarks.sort((a, b) => props.newestFirst ? b.dateAdded! - a.dateAdded! : a.dateAdded! - b.dateAdded!);
+    if (searchKeyword.length > 0) {
+      newBookmarks = newBookmarks.filter((elem) => {
+        return elem.title.toLowerCase().includes(searchKeyword) ||
+          elem.url?.toLowerCase().includes(searchKeyword);
+      });
+    }
+    return newBookmarks;
+  };
+  const filteredBookmarks = applyChangesToBookmarks();
 
   return (
     <div className="bookmark-wrapper">
-      {bookmarks.map((elem, index) => {
+      {filteredBookmarks.map((elem, index) => {
         const dateAdded = moment(elem.dateAdded),
-          // metaLoaded = bookmarkMetas.length === bookmarks.length;
-          metaLoaded = false;
+          metaLoaded = bookmarkMetas.length === bookmarks.length;
         return (
           <Card>
             <a
               href={elem.url}
-              target={props.options?.openBookmarkInNewTab ? "_blank" : "_self"}
+              target={options.openBookmarkInNewTab ? "_blank" : "_self"}
               onClick={(e) => handleLinkClick(e, elem)}
             >
               <img
@@ -149,7 +115,7 @@ const Bookmarks = (props: BookmarksProps) => {
               <H5 className="bookmark-card-title">
                 <a
                   href={elem.url}
-                  target={props.options?.openBookmarkInNewTab ? "_blank" : "_self"}
+                  target={options.openBookmarkInNewTab ? "_blank" : "_self"}
                   onClick={(e) => handleLinkClick(e, elem)}
                 >
                   {elem.title}
@@ -176,14 +142,14 @@ const Bookmarks = (props: BookmarksProps) => {
           </Card>
         );
       })}
-      {bookmarks.length === 0 && (
+      {filteredBookmarks.length === 0 && (
         <NonIdealState 
           className="empty-message"
-          icon={props.searchKeyword.length > 0 ? 'search' : 'book'}
-          title={props.searchKeyword.length > 0 ? "No search results" : "No bookmarks in folder"}
+          icon={searchKeyword.length > 0 ? 'search' : 'book'}
+          title={searchKeyword.length > 0 ? "No search results" : "No bookmarks in folder"}
           description={(
             <div>
-              {props.searchKeyword.length > 0 ? "Your search didn't match any bookmarks." : "Please add some bookmarks to \"Read Later Bookmarks\" to get started"}
+              {searchKeyword.length > 0 ? "Your search didn't match any bookmarks." : "Please add some bookmarks to \"Read Later Bookmarks\" to get started"}
             </div>
           )}
         />

@@ -1,36 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from "styled-components";
 import {
-  Button,
-  Navbar,
-  NavbarGroup,
-  NavbarHeading,
-  ControlGroup,
-  InputGroup,
-  Alignment,
-  Classes,
-  Menu,
-  MenuItem,
   Toaster,
   Position,
 } from '@blueprintjs/core';
-import { Popover2 } from "@blueprintjs/popover2";
 import 'normalize.css/normalize.css';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
 import './App.css';
-// import Bookmarks from './components/bookmarks';
 import Bookmarks from './features/bookmarks/bookmarks';
 import Nav from './components/navbar';
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import { fetchreadLaterFolder, selectReadLaterFolder } from './features/readLaterFolder/readLaterFolderSlice';
-import { fetchBookmarks, selectAllBookmarks } from './features/bookmarks/bookmarksSlice';
+import { fetchreadLaterFolder } from './features/readLaterFolder/readLaterFolderSlice';
+import { fetchBookmarks } from './features/bookmarks/bookmarksSlice';
+import { fetchOptions } from './features/options/optionsSlice';
 // import { IOptions, DEFAULT_SETTINGS } from '../../options/src/App';
 
 // need to find a way to make single source of truth
 export type IOptions = {
-  [key: string]: any;
   defaultArchiveId: string;
   openBookmarkInNewTab: boolean;
   actionOnBookmarkClicked: string;
@@ -42,111 +30,40 @@ export const DEFAULT_SETTINGS = {
   actionOnBookmarkClicked: 'none'
 };
 
-let readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null = null;
-
 function App() {
   const dispatch = useAppDispatch();
   const bookmarksStatus = useAppSelector(state => state.bookmarks.status);
-  const bookmarks = useAppSelector(selectAllBookmarks);
   const readLaterFolderStatus = useAppSelector(state => state.readLaterFolder.status);
+  const optionsStatus = useAppSelector(state => state.options.status);
+  const options = useAppSelector(state => state.options.options);
   const [newestFirst, setNewestFirst] = useState<boolean>(false);
-  const [searchKeyword, setSearchKeyword] = useState<string>('');
-  // const [bookmarks, setBookmarks] = useState<Array<chrome.bookmarks.BookmarkTreeNode>>([]);
-  const [options, setOptions] = useState<IOptions | null>(null);
   const [bulkEdit, setBulkEdit] = useState<boolean>(false);
 
   const toaster = useRef(null);
 
-  // const refreshBookmarks = () => {
-  //   const getBookmarks = async (folderId: string) => {
-  //     let folderChildrenResult = await chrome.bookmarks.getChildren(folderId);
-  //     folderChildrenResult.sort((a, b) => newestFirst ? b.dateAdded! - a.dateAdded! : a.dateAdded! - b.dateAdded!);
-  //     if (searchKeyword.length > 0) {
-  //       folderChildrenResult = folderChildrenResult.filter((elem) => {
-  //         return elem.title.toLowerCase().includes(searchKeyword) ||
-  //           elem.url?.toLowerCase().includes(searchKeyword);
-  //       });
-  //     }
-  //     // console.log(folderChildrenResult);
-  //     setBookmarks(folderChildrenResult);
-  //   };
-  //   if (readLaterFolder) {
-  //     getBookmarks(readLaterFolder.id);
-  //   }
-  // };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchKeyword(e.target.value.toLowerCase());
-  };
-
-  const handleSearchClear = () => {
-    setSearchKeyword('');
-  };
-
-  const sortMenu = (
-    <Menu>
-      <MenuItem icon="sort-asc" text="Oldest first" onClick={() => setNewestFirst(false)}/>
-      <MenuItem icon="sort-desc" text="Newest first" onClick={() => setNewestFirst(true)}/>
-    </Menu>
-  );
-
-  const searchClear = (
-    <Button
-      className={Classes.MINIMAL}
-      icon="cross"
-      onClick={handleSearchClear}
-      minimal
-    />
-  );
-
-  // useEffect(() => {
-  //   const findOrCreateReadLaterFolder = async () => {
-  //     const readLaterFolderSearchResult = await chrome.bookmarks.search("Read Later Bookmarks");
-  //     let readLaterFolder = null;
-  //     if (readLaterFolderSearchResult.length > 0) {
-  //       readLaterFolder = readLaterFolderSearchResult[0];
-  //     } else {
-  //       readLaterFolder = await chrome.bookmarks.create({ title: "Read Later Bookmarks" });
-  //     }
-  //     return readLaterFolder
-  //   };
-
-  //   findOrCreateReadLaterFolder()
-  //     .then(res => {
-  //       readLaterFolder = res;
-  //       refreshBookmarks();
-  //     })
-  //     .catch(console.error);
-
-  //   chrome.storage.local.get(Object.keys(DEFAULT_SETTINGS), (result) => {
-  //     setOptions({...result} as IOptions);
-  //   });
-
-  //   chrome.bookmarks.onChanged.addListener(() => {
-  //     console.log("chrome.bookmarks.onChanged fired");
-  //     refreshBookmarks();
-  //   });
-  //   chrome.bookmarks.onChildrenReordered.addListener(() => {
-  //     console.log("chrome.bookmarks.onChildrenReordered fired");
-  //     refreshBookmarks();
-  //   });
-  //   chrome.bookmarks.onCreated.addListener(() => {
-  //     console.log("chrome.bookmarks.onCreated fired");
-  //     refreshBookmarks();
-  //   });
-  //   chrome.bookmarks.onMoved.addListener(() => {
-  //     console.log("chrome.bookmarks.onMoved fired");
-  //     refreshBookmarks();
-  //   });
-  //   chrome.bookmarks.onRemoved.addListener(() => {
-  //     console.log("chrome.bookmarks.onRemoved fired");
-  //     refreshBookmarks();
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   refreshBookmarks();
-  // }, [newestFirst, searchKeyword]);
+  useEffect(() => {
+    chrome.bookmarks.onChanged.addListener(() => {
+      console.log("chrome.bookmarks.onChanged fired");
+      dispatch(fetchBookmarks());
+    });
+    chrome.bookmarks.onChildrenReordered.addListener(() => {
+      console.log("chrome.bookmarks.onChildrenReordered fired");
+      dispatch(fetchBookmarks());
+    });
+    chrome.bookmarks.onCreated.addListener(() => {
+      console.log("chrome.bookmarks.onCreated fired");
+      dispatch(fetchBookmarks());
+    });
+    chrome.bookmarks.onMoved.addListener(() => {
+      console.log("chrome.bookmarks.onMoved fired");
+      dispatch(fetchBookmarks());
+    });
+    chrome.bookmarks.onRemoved.addListener(() => {
+      console.log("chrome.bookmarks.onRemoved fired");
+      dispatch(fetchBookmarks());
+    });
+  }, [])
 
   useEffect(() => {
     if (readLaterFolderStatus === 'idle') {
@@ -160,27 +77,23 @@ function App() {
     }
   }, [bookmarksStatus, readLaterFolderStatus, dispatch])
 
-  // useEffect(() => {
-  //   const handleStorageChange = (changes: object) => {
-  //     chrome.storage.onChanged.removeListener(handleStorageChange);
-  //     if (options) {
-  //       const newOptions = {...options} as IOptions;
-  //       for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-  //         newOptions[key] = newValue;
-  //       }
-  //       setOptions(newOptions);
-  //     }
-  //   };
+  useEffect(() => {
+    if (optionsStatus === 'idle') {
+      dispatch(fetchOptions());
+    }
 
-  //   chrome.storage.onChanged.addListener(handleStorageChange);
-  // }, [options]);
+    const handleStorageChange = (changes: object) => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+      dispatch(fetchOptions());
+    };
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+  }, [options, optionsStatus, dispatch]);
 
   return (
     <div className="App">
       <div className="container">
         <Nav
-          searchKeyword={searchKeyword}
-          setSearchKeyword={setSearchKeyword}
           newestFirst={newestFirst}
           setNewestFirst={setNewestFirst}
           bulkEdit={bulkEdit}
@@ -188,13 +101,8 @@ function App() {
           toaster={toaster.current}
         />
         <Bookmarks
-          // readLaterFolder={readLaterFolder}
-          searchKeyword={searchKeyword}
-          // bookmarks={bookmarks}
-          // setBookmarks={setBookmarks}
-          // refreshBookmarks={refreshBookmarks}
+          newestFirst={newestFirst}
           toaster={toaster.current}
-          options={options}
         />
       </div>
       <Toaster position={Position.BOTTOM_LEFT} ref={toaster} />
