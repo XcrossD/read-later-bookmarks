@@ -79,22 +79,35 @@ const Bookmarks = (props: BookmarksProps) => {
     });
   };
 
-  const applyChangesToBookmarks = () => {
+  const applyChangesToData = () => {
     let newBookmarks = [...bookmarks];
+    let newBookmarkMetas = [...bookmarkMetas];
     newBookmarks.sort((a, b) => props.newestFirst ? b.dateAdded! - a.dateAdded! : a.dateAdded! - b.dateAdded!);
+    newBookmarkMetas.sort((a, b) => {
+      const bookmarkA = newBookmarks.find(elem => elem.id === a.id);
+      const bookmarkB = newBookmarks.find(elem => elem.id === b.id);
+      return props.newestFirst ?
+        bookmarkB?.dateAdded! - bookmarkA?.dateAdded! :
+        bookmarkA?.dateAdded! - bookmarkB?.dateAdded! 
+    })
     if (searchKeyword.length > 0) {
       newBookmarks = newBookmarks.filter((elem) => {
         return elem.title.toLowerCase().includes(searchKeyword) ||
           elem.url?.toLowerCase().includes(searchKeyword);
       });
+      newBookmarkMetas = newBookmarkMetas.filter((meta) => {
+        const bookmark = newBookmarks.find(elem => elem.id === meta.id);
+        return bookmark;
+      });
     }
-    return newBookmarks;
+    return [newBookmarks, newBookmarkMetas] as [Array<chrome.bookmarks.BookmarkTreeNode>, Array<BookmarkMeta>];
   };
-  const filteredBookmarks = applyChangesToBookmarks();
+
+  const [changedBookmarks, changedbookmarkMetas] = applyChangesToData();
 
   return (
     <div className="bookmark-wrapper">
-      {filteredBookmarks.map((elem, index) => {
+      {changedBookmarks.map((elem, index) => {
         const dateAdded = moment(elem.dateAdded),
           metaLoaded = bookmarkMetas.length === bookmarks.length;
         return (
@@ -106,7 +119,7 @@ const Bookmarks = (props: BookmarksProps) => {
             >
               <img
                 className={metaLoaded ? "bookmark-card-image" : Classes.SKELETON}
-                src={metaLoaded ? bookmarkMetas[index].image || 'https://picsum.photos/200' : 'https://picsum.photos/200'}
+                src={metaLoaded ? changedbookmarkMetas[index].image || 'https://picsum.photos/200' : 'https://picsum.photos/200'}
                 alt={'Thumbnail'}
               />
             </a>
@@ -142,7 +155,7 @@ const Bookmarks = (props: BookmarksProps) => {
           </Card>
         );
       })}
-      {filteredBookmarks.length === 0 && (
+      {changedBookmarks.length === 0 && (
         <NonIdealState 
           className="empty-message"
           icon={searchKeyword.length > 0 ? 'search' : 'book'}
