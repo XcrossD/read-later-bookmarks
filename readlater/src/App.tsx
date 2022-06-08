@@ -13,8 +13,9 @@ import Bookmarks from './features/bookmarks/bookmarks';
 import Nav from './components/navbar';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { fetchreadLaterFolder } from './features/readLaterFolder/readLaterFolderSlice';
-import { fetchBookmarks } from './features/bookmarks/bookmarksSlice';
+import { fetchBookmarks, selectAllBookmarks } from './features/bookmarks/bookmarksSlice';
 import { fetchOptions } from './features/options/optionsSlice';
+import BulkEditBookmarks from './features/bookmarks/bulkbookmarks';
 // import { IOptions, DEFAULT_SETTINGS } from '../../options/src/App';
 
 // need to find a way to make single source of truth
@@ -33,14 +34,15 @@ export const DEFAULT_SETTINGS = {
 function App() {
   const dispatch = useAppDispatch();
   const bookmarksStatus = useAppSelector(state => state.bookmarks.status);
+  const bookmarks: Array<chrome.bookmarks.BookmarkTreeNode> = useAppSelector(selectAllBookmarks);
   const readLaterFolderStatus = useAppSelector(state => state.readLaterFolder.status);
   const optionsStatus = useAppSelector(state => state.options.status);
   const options = useAppSelector(state => state.options.options);
   const [newestFirst, setNewestFirst] = useState<boolean>(false);
   const [bulkEdit, setBulkEdit] = useState<boolean>(false);
+  const [selectedBookmarks, setSelectedBookmarks] = useState<{ [key: string]: boolean }>({})
 
   const toaster = useRef(null);
-
 
   useEffect(() => {
     chrome.bookmarks.onChanged.addListener(() => {
@@ -90,6 +92,15 @@ function App() {
     chrome.storage.onChanged.addListener(handleStorageChange);
   }, [options, optionsStatus, dispatch]);
 
+  useEffect(() => {
+    for (const prop of Object.getOwnPropertyNames(selectedBookmarks)) {
+      delete selectedBookmarks[prop];
+    }
+    bookmarks.forEach((elem) => {
+      selectedBookmarks[elem.id] = false;
+    });
+  }, [bookmarks])
+
   return (
     <div className="App">
       <div className="container">
@@ -99,11 +110,22 @@ function App() {
           bulkEdit={bulkEdit}
           setBulkEdit={setBulkEdit}
           toaster={toaster.current}
+          selectedBookmarks={selectedBookmarks}
+          setSelectedBookmarks={setSelectedBookmarks}
         />
-        <Bookmarks
-          newestFirst={newestFirst}
-          toaster={toaster.current}
-        />
+        {bulkEdit ? (
+          <BulkEditBookmarks
+            newestFirst={newestFirst}
+            toaster={toaster.current}
+            selectedBookmarks={selectedBookmarks}
+            setSelectedBookmarks={setSelectedBookmarks}
+          />
+        ) : (
+          <Bookmarks
+            newestFirst={newestFirst}
+            toaster={toaster.current}
+          />
+        )}
       </div>
       <Toaster position={Position.BOTTOM_LEFT} ref={toaster} />
     </div>

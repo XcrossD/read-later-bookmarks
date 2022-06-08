@@ -2,6 +2,7 @@ import { createSlice, nanoid, createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 
 export interface BookmarkMeta {
+  id: string;
   description: string | null;
   image: string | null;
 }
@@ -49,10 +50,11 @@ export const fetchBookmarkMetas = createAsyncThunk('bookmarkMetas/fetchBookmarkM
     });
     const responses = await Promise.all(promiseArr);
     const responseTexts = await Promise.all(responses.map(res => res.text()));
-    const metas = responseTexts.map((text) => {
+    const metas = responseTexts.map((text, index) => {
       const doc = parser.parseFromString(text, "text/html");
       const metatags = doc.getElementsByTagName("meta");
       const metaObj = {
+        id: arg[index].id,
         description: null,
         image: null,
       } as BookmarkMeta;
