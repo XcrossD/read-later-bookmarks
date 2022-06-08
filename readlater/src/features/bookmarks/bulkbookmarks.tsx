@@ -68,7 +68,7 @@ const BulkEditBookmarks = (props: BookmarksProps) => {
             <Icon
               className="bookmark-card-selection"
               icon={selected ? "selection" : "circle"}
-              color="rgba(0, 0, 0, 0.8)"
+              color="rgba(0, 0, 0, 0.6)"
             />
             <img
               className={metaLoaded ? "bookmark-card-image bookmark-card-image--bulkmode" : Classes.SKELETON}
