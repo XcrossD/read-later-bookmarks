@@ -1,0 +1,17 @@
+import { configureStore } from '@reduxjs/toolkit'
+import bookmarksReducer from '../features/bookmarks/bookmarksSlice'
+import readLaterFolderReducer from '../features/readLaterFolder/readLaterFolderSlice'
+import searchKeywordReducer from '../features/searchKeyword/searchKeywordSlice'
+
+export const store = configureStore({
+  reducer: {
+    bookmarks: bookmarksReducer,
+    readLaterFolder: readLaterFolderReducer,
+    searchKeyword: searchKeywordReducer
+  },
+})
+
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<typeof store.getState>
+// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
+export type AppDispatch = typeof store.dispatch

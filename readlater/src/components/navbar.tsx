@@ -14,6 +14,7 @@ import {
   ButtonGroup,
 } from '@blueprintjs/core';
 import { Popover2 } from "@blueprintjs/popover2";
+import { useAppDispatch } from '../app/hooks';
 
 interface INavProps {
   searchKeyword: string;
@@ -26,7 +27,8 @@ interface INavProps {
 }
 
 const Nav = (props: INavProps) => {
-  
+  const dispatch = useAppDispatch();
+
   const handleArchive = () => {
 
   };
