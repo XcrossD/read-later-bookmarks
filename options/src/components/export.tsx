@@ -6,7 +6,6 @@ interface IPocket {
   username: string;
 }
 
-const POCKET_CONSUMER_KEY = '';
 const POCKET_REQUEST_URL = 'https://getpocket.com/v3/oauth/request';
 const POCKET_AUTHORIZE_URL = 'https://getpocket.com/v3/oauth/authorize';
 const re = /access_token=(.+)&username=(.+)/g;
@@ -26,7 +25,7 @@ const ExportSettings = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          "consumer_key": POCKET_CONSUMER_KEY,
+          "consumer_key": process.env.REACT_APP_POCKET_CONSUMER_KEY,
           'redirect_uri': redirectUri
         })
       });
@@ -40,7 +39,7 @@ const ExportSettings = () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            'consumer_key': POCKET_CONSUMER_KEY,
+            'consumer_key': process.env.REACT_APP_POCKET_CONSUMER_KEY,
             'code': requestToken
           })
         })
