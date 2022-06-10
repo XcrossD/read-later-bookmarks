@@ -28,8 +28,11 @@ const LoginDialogBody = (props: LoginDialogBodyProps) => {
 
   const handleInstapaperConnect = () => {
     const instapaperAuth = async () => {
-      const requestUrl = `${INSTAPAPER_AUTHORIZE_URL}?username=${username}&password=${password}`;
-      const requestResponse = await fetch(requestUrl);
+      const requestResponse = await fetch(INSTAPAPER_AUTHORIZE_URL, {
+        headers: {
+          'Authorization': 'Basic ' + btoa(username + ":" + password)
+        }
+      });
       if (requestResponse.status === 200) {
         setError('');
         const salt = bcrypt.genSaltSync(10);
