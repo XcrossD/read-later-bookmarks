@@ -154,9 +154,9 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [x] Manage individual bookmarks
 - [x] Search and sort
 - [x] Bulk archive and bulk delete
-- [ ] Export to 3rd party read later apps
-    - [ ] Pocket
-    - [ ] Instapaper
+- [x] Export to 3rd party read later apps
+    - [x] Pocket
+    - [x] Instapaper
 - [ ] Bulk export
 - [ ] Combine folders
 
