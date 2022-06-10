@@ -69,3 +69,16 @@
 .empty-message {
   grid-column-start: 2;
 }
+
+.wrapper-export-icon {
+  display: flex;
+}
+
+.export-icon {
+  width: 60px;
+  height: 60px;
+}
+
+.disconnect-hint {
+  padding: 20px;
+}

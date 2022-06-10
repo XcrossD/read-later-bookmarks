@@ -4,6 +4,7 @@ import bookmarkMetasReducer from '../features/bookmarkMetas/bookmarkMetasSlice'
 import optionsReducer from '../features/options/optionsSlice'
 import readLaterFolderReducer from '../features/readLaterFolder/readLaterFolderSlice'
 import searchKeywordReducer from '../features/searchKeyword/searchKeywordSlice'
+import pocketReducer from '../features/pocket/pocketSlice'
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     searchKeyword: searchKeywordReducer,
     options: optionsReducer,
     bookmarkMetas: bookmarkMetasReducer,
+    pocket: pocketReducer,
   },
 })
 

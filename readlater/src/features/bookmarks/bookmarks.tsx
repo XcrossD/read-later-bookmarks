@@ -5,6 +5,7 @@ import { Button, ButtonGroup, Card, Classes, H5, IToastProps, NonIdealState, Toa
 import { IOptions } from '../../App';
 import { selectAllBookmarks } from './bookmarksSlice';
 import { BookmarkMeta, selectAllBookmarkMetas } from '../bookmarkMetas/bookmarkMetasSlice';
+import ExportButtonWithDialog from '../../components/exportdialog';
 
 interface BookmarksProps {
   newestFirst: boolean;
@@ -55,10 +56,6 @@ const Bookmarks = (props: BookmarksProps) => {
         } as IToastProps)
       }
     );
-  };
-
-  const handleShare = () => {
-
   };
 
   const handleDelete = (node: chrome.bookmarks.BookmarkTreeNode) => {
@@ -141,10 +138,9 @@ const Bookmarks = (props: BookmarksProps) => {
                 className={Classes.BUTTON}
                 onClick={() => handleArchive(elem.id)}
               />
-              <Button
-                icon="export"
-                className={Classes.BUTTON}
-                onClick={handleShare}
+              <ExportButtonWithDialog
+                node={elem}
+                toaster={props.toaster}
               />
               <Button
                 icon="trash"
