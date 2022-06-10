@@ -9,3 +9,15 @@
 .title {
   margin: 40px 0 20px;
 }
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.error-message {
+  color: #8E292C;
+  margin-bottom: 15px;
+}
