@@ -1,9 +1,12 @@
 import { Button, Classes, Dialog, IToastProps, Toaster } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
 import { useCallback, useEffect, useState } from "react";
+import CryptoJS from "crypto-js";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { fetchPocket, IPocket } from "../features/pocket/pocketSlice";
+import { fetchInstapaper, IInstapaper } from "../features/credentials/instapaperSlice";
+import { fetchPocket, IPocket } from "../features/credentials/pocketSlice";
 import pocketLogo from '../images/pocket.png';
+import instapaperLogo from '../images/instapaper.png';
 
 interface IExportButtonWithDialog {
   node: chrome.bookmarks.BookmarkTreeNode;
@@ -17,6 +20,7 @@ interface IDialogBody {
 }
 
 const POCKET_ADD_URL = 'https://getpocket.com/v3/add';
+const INSTAPAPER_ADD_URL = 'https://www.instapaper.com/api/add';
 
 const renderDisconnectedHint = (type: string): JSX.Element => {
   return (
@@ -51,16 +55,61 @@ const exportToPocket = (param: {
     .catch(console.error);
 }
 
+const exportToInstapaper = (param: {
+  node: chrome.bookmarks.BookmarkTreeNode;
+  instapaper: IInstapaper;
+  handleClose: Function;
+  addToast: Function;
+}) => {
+  const { node, instapaper, handleClose, addToast } = param;
+  const passwordBytes = CryptoJS.AES.decrypt(instapaper.password || '', process.env.REACT_APP_SECRET_PASSPHRASE || '');
+  const password = passwordBytes.toString(CryptoJS.enc.Utf8);
+  const url = `${INSTAPAPER_ADD_URL}?url=${node.url}`;
+  fetch(url, {
+    headers: {
+      'Authorization': 'Basic ' + btoa(instapaper.username + ":" + password)
+    }
+  })
+    .then((response) => {
+      switch(response.status) {
+        case 201:
+          handleClose();
+          addToast({ message: `'${node.title}' exported to Instapaper` });
+          break;
+        case 400:
+          console.log('Bad request or exceeded the rate limit.');
+          break;
+        case 403:
+          console.log('Invalid username or password.');
+          break;
+        case 500:
+          console.log('The service encountered an error. Please try again later.');
+          break;
+        default:
+          break;
+      }
+    })
+    .catch(console.error);
+}
+
 const DialogBody = (props: IDialogBody) => {
   const dispatch = useAppDispatch();
   const pocket: IPocket = useAppSelector(state => state.pocket.pocket);
   const pocketStatus: string = useAppSelector(state => state.pocket.status);
+  const instapaper: IInstapaper = useAppSelector(state => state.instapaper.instapaper);
+  const instapaperStatus: string = useAppSelector(state => state.instapaper.status);
 
   useEffect(() => {
     if (pocketStatus === 'idle') {
       dispatch(fetchPocket());
     }
   }, [pocketStatus, dispatch]);
+
+  useEffect(() => {
+    if (instapaperStatus === 'idle') {
+      dispatch(fetchInstapaper());
+    }
+  }, [instapaperStatus, dispatch]);
   
   return (
     <div className={Classes.DIALOG_BODY}>
@@ -78,6 +127,24 @@ const DialogBody = (props: IDialogBody) => {
             onClick={() => exportToPocket({
               node: props.node,
               pocket,
+              handleClose: props.handleClose,
+              addToast: props.addToast
+            })}
+          />
+        </Popover2>
+        <Popover2
+          disabled={Object.keys(pocket).length > 0}
+          content={renderDisconnectedHint('Instapaper')}
+          interactionKind="hover"
+          placement="bottom"
+        >
+          <Button
+            minimal
+            disabled={Object.keys(instapaper).length === 0}
+            icon={<img className="export-icon" src={instapaperLogo} alt="Instapaper Logo" />}
+            onClick={() => exportToInstapaper({
+              node: props.node,
+              instapaper,
               handleClose: props.handleClose,
               addToast: props.addToast
             })}

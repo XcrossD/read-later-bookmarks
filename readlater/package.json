@@ -14,6 +14,7 @@
     "@types/node": "^16.11.36",
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.5",
+    "crypto-js": "^4.1.1",
     "moment": "^2.29.3",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
@@ -49,6 +50,7 @@
   "homepage": "readlater/build",
   "devDependencies": {
     "@types/chrome": "^0.0.176",
+    "@types/crypto-js": "^4.1.1",
     "@types/styled-components": "^5.1.25"
   }
 }

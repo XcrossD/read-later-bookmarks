@@ -1,6 +1,6 @@
 import { Button, Dialog, FormGroup, H1, InputGroup, Intent } from "@blueprintjs/core";
+import CryptoJS from "crypto-js";
 import React, { useEffect, useState } from "react";
-import bcrypt from "bcryptjs";
 
 interface IPocket {
   access_token?: string;
@@ -35,11 +35,10 @@ const LoginDialogBody = (props: LoginDialogBodyProps) => {
       });
       if (requestResponse.status === 200) {
         setError('');
-        const salt = bcrypt.genSaltSync(10);
-        const passwordHash = bcrypt.hashSync(password, salt);
+        const encryptedPassword = CryptoJS.AES.encrypt(password, process.env.REACT_APP_SECRET_PASSPHRASE || '').toString();
         const newInstapaperData = {
           username,
-          password: passwordHash
+          password: encryptedPassword
         }
         await chrome.storage.local.set({ instapaper: newInstapaperData });
         props.handleClose();

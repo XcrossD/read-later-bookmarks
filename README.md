@@ -224,7 +224,7 @@ Project Link: [https://github.com/XcrossD/read-later-bookmarks](https://github.c
 * <a target="_blank" href="https://icons8.com/icon/80310/bookmark">Bookmark</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 * [Best README template by othneildrew](https://github.com/othneildrew/Best-README-Template)
 * <a href="https://www.flaticon.com/free-icons/pocket" title="pocket icons">Pocket icons created by Pixel perfect - Flaticon</a>
-
+* <a href="https://www.flaticon.com/free-icons/instapaper" title="instapaper icons">Instapaper icons created by pictogramer - Flaticon</a>
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
