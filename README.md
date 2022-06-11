@@ -157,7 +157,8 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [x] Export to 3rd party read later apps
     - [x] Pocket
     - [x] Instapaper
-- [ ] Bulk export
+- [x] Bulk export
+- [ ] Tags
 - [ ] Combine folders
 
 See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
