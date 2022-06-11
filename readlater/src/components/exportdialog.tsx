@@ -41,7 +41,7 @@ const exportToPocket = (param: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      'url': encodeURIComponent(node.url || ''),
+      'url': node.url,
       'consumer_key': process.env.REACT_APP_POCKET_CONSUMER_KEY,
       'access_token': pocket.access_token
     })
