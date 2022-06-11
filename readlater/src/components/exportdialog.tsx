@@ -33,8 +33,9 @@ const exportToPocket = (param: {
   pocket: IPocket;
   handleClose: Function;
   addToast: Function;
+  setError: Function;
 }) => {
-  const { node, pocket, handleClose, addToast } = param;
+  const { node, pocket, handleClose, addToast, setError } = param;
   fetch(POCKET_ADD_URL, {
     method: 'POST',
     headers: {
@@ -46,9 +47,27 @@ const exportToPocket = (param: {
       'access_token': pocket.access_token
     })
   })
-    .then((response) => response.json())
+    .then((response) => {
+      if (response.ok) {
+        return response.json()
+      }
+      return response.text().then(text => {
+        const headers = response.headers.entries();
+        let result = headers.next();
+        while (!result.done) {
+          const [key, value] = result.value;
+          if (key === 'x-error') {
+            text += ` (${value})`;
+            break;
+          }
+          result = headers.next();
+        }
+        setError(text);
+        throw new Error(text);
+      });
+    })
     .then((data) => {
-      console.log('pocket data', data);
+      // console.log('pocket data', data);
       handleClose();
       addToast({ message: `'${node.title}' exported to Pocket` });
     })
@@ -60,8 +79,9 @@ const exportToInstapaper = (param: {
   instapaper: IInstapaper;
   handleClose: Function;
   addToast: Function;
+  setError: Function;
 }) => {
-  const { node, instapaper, handleClose, addToast } = param;
+  const { node, instapaper, handleClose, addToast, setError } = param;
   const passwordBytes = CryptoJS.AES.decrypt(instapaper.password || '', process.env.REACT_APP_SECRET_PASSPHRASE || '');
   const password = passwordBytes.toString(CryptoJS.enc.Utf8);
   const url = `${INSTAPAPER_ADD_URL}?url=${node.url}`;
@@ -78,12 +98,15 @@ const exportToInstapaper = (param: {
           break;
         case 400:
           console.log('Bad request or exceeded the rate limit.');
+          setError(`${response.status} Bad request or exceeded the rate limit.'`);
           break;
         case 403:
           console.log('Invalid username or password.');
+          setError(`${response.status} Invalid username or password.`);
           break;
         case 500:
           console.log('The service encountered an error. Please try again later.');
+          setError(`${response.status} The service encountered an error. Please try again later.`);
           break;
         default:
           break;
@@ -98,6 +121,7 @@ const DialogBody = (props: IDialogBody) => {
   const pocketStatus: string = useAppSelector(state => state.pocket.status);
   const instapaper: IInstapaper = useAppSelector(state => state.instapaper.instapaper);
   const instapaperStatus: string = useAppSelector(state => state.instapaper.status);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     if (pocketStatus === 'idle') {
@@ -128,7 +152,8 @@ const DialogBody = (props: IDialogBody) => {
               node: props.node,
               pocket,
               handleClose: props.handleClose,
-              addToast: props.addToast
+              addToast: props.addToast,
+              setError
             })}
           />
         </Popover2>
@@ -146,11 +171,19 @@ const DialogBody = (props: IDialogBody) => {
               node: props.node,
               instapaper,
               handleClose: props.handleClose,
-              addToast: props.addToast
+              addToast: props.addToast,
+              setError
             })}
           />
         </Popover2>
       </div>
+      {error.length > 0 && (
+        <div className={"export-dialog__error-message"}>
+          {`Error: ${error}`}
+          <br />
+          If this error persists, please report it to <a href="https://github.com/XcrossD/read-later-bookmarks/issues/new" target="_blank">Github</a> or <a href="mailto:readlaterbookmarks@gmail.com">send an email</a>.
+        </div>
+      )}
     </div>
   );
 }

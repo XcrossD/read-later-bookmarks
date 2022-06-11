@@ -74,6 +74,11 @@
   display: flex;
 }
 
+.export-dialog__error-message {
+  color: #8E292C;
+  padding-top: 10px;
+}
+
 .export-icon {
   width: 60px;
   height: 60px;
