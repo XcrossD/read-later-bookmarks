@@ -50,7 +50,6 @@
   "homepage": "readlater/build",
   "devDependencies": {
     "@types/chrome": "^0.0.176",
-    "@types/crypto-js": "^4.1.1",
-    "@types/styled-components": "^5.1.25"
+    "@types/crypto-js": "^4.1.1"
   }
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppSelector } from '../../app/hooks';
 import moment from 'moment';
-import { Button, ButtonGroup, Card, Classes, H5, Icon, IToastProps, NonIdealState, Toaster } from '@blueprintjs/core';
+import { Button, ButtonGroup, Card, Classes, H5, Icon, NonIdealState, Toaster } from '@blueprintjs/core';
 import { selectAllBookmarks } from './bookmarksSlice';
 import { BookmarkMeta, selectAllBookmarkMetas } from '../bookmarkMetas/bookmarkMetasSlice';
 
@@ -16,10 +16,6 @@ const BulkEditBookmarks = (props: BookmarksProps) => {
   const bookmarks: Array<chrome.bookmarks.BookmarkTreeNode> = useAppSelector(selectAllBookmarks);
   const bookmarkMetas: Array<BookmarkMeta> = useAppSelector(selectAllBookmarkMetas);
   const searchKeyword: string = useAppSelector(state => state.searchKeyword);
-
-  const addToast = (toast: IToastProps) => {
-    props.toaster?.show(toast);
-  }
 
   const handleCardClick = (id: string) => {
     const newResult = {...props.selectedBookmarks};

@@ -1,4 +1,4 @@
-import { createSlice, nanoid, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 import { fetchBookmarkMetas } from '../bookmarkMetas/bookmarkMetasSlice';
 

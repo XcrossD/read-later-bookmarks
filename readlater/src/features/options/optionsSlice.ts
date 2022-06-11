@@ -1,4 +1,4 @@
-import { createSlice, nanoid, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { IOptions } from '../../App';
 
 export const DEFAULT_SETTINGS = {
