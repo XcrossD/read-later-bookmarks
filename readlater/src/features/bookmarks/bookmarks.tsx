@@ -139,7 +139,7 @@ const Bookmarks = (props: BookmarksProps) => {
                 onClick={() => handleArchive(elem.id)}
               />
               <ExportButtonWithDialog
-                node={elem}
+                data={elem}
                 toaster={props.toaster}
               />
               <Button

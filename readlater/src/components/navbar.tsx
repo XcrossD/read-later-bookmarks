@@ -19,6 +19,7 @@ import { IOptions } from '../App';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectAllBookmarks } from '../features/bookmarks/bookmarksSlice';
 import { updateSearchKeyword } from '../features/searchKeyword/searchKeywordSlice';
+import ExportButtonWithDialog from './exportdialog';
 
 interface INavProps {
   newestFirst: boolean;
@@ -68,7 +69,7 @@ const Nav = (props: INavProps) => {
   const handleBulkDelete = () => {
     const bookmarkIds = Object.keys(props.selectedBookmarks)
       .filter(id => props.selectedBookmarks[id]);
-    const bookmarkCopy = bookmarks.filter(elem => bookmarkIds.indexOf(elem.id) !== -1)
+    const bookmarkCopy = bookmarks.filter(elem => bookmarkIds.indexOf(elem.id) !== -1);
     Promise.all(bookmarkIds.map(id => {
       return chrome.bookmarks.remove(id)
     }))
@@ -91,6 +92,13 @@ const Nav = (props: INavProps) => {
       })
       .catch(console.error)
   };
+
+  const transformSelectedBookmarks = () => {
+    const bookmarkIds = Object.keys(props.selectedBookmarks)
+      .filter(id => props.selectedBookmarks[id]);
+    const bookmarkCopy = bookmarks.filter(elem => bookmarkIds.indexOf(elem.id) !== -1);
+    return bookmarkCopy;
+  }
   
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(updateSearchKeyword(e.target.value.toLowerCase()))
@@ -145,11 +153,10 @@ const Nav = (props: INavProps) => {
                 disabled={numOfItemsSelected === 0}
                 onClick={handleBulkArchive}
               />
-              {/* <Button
-                icon="export"
-                className={Classes.BUTTON}
-                onClick={handleShare}
-              /> */}
+              <ExportButtonWithDialog
+                data={transformSelectedBookmarks()}
+                toaster={props.toaster}
+              />
               <Button
                 icon="trash"
                 className={Classes.BUTTON}
