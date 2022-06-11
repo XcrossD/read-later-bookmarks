@@ -108,11 +108,15 @@ const Nav = (props: INavProps) => {
     dispatch(updateSearchKeyword(''))
   };
 
+  const clearSelectedBookmarks = () => {
+    const newResult = {...props.selectedBookmarks};
+    Object.keys(newResult).forEach(id => newResult[id] = false)
+    props.setSelectedBookmarks(newResult);
+  }
+  
   const handleClearBtn = () => {
     if (numOfItemsSelected > 0) {
-      const newResult = {...props.selectedBookmarks};
-      Object.keys(newResult).forEach(id => newResult[id] = false)
-      props.setSelectedBookmarks(newResult);
+      clearSelectedBookmarks();
     } else {
       props.setBulkEdit(false)
     }
@@ -193,7 +197,10 @@ const Nav = (props: INavProps) => {
             <Button
               className={Classes.MINIMAL}
               icon="cross"
-              onClick={() => props.setBulkEdit(false)}
+              onClick={() => {
+                clearSelectedBookmarks();
+                props.setBulkEdit(false)
+              }}
             />
           </ButtonGroup>
         ) : (
