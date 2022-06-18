@@ -1,68 +1,132 @@
-import React, { useState, useEffect } from 'react';
-import styled from "styled-components";
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  Button,
-  Navbar,
-  NavbarGroup,
-  NavbarHeading,
-  ControlGroup,
-  InputGroup,
-  Alignment,
-  Classes,
-  Menu,
-  MenuItem
+  Toaster,
+  Position,
 } from '@blueprintjs/core';
 import 'normalize.css/normalize.css';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
+import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
 import './App.css';
-import ControlBar from './components/controlbar';
-import Bookmarks from './components/bookmarks';
+import Bookmarks from './features/bookmarks/bookmarks';
+import Nav from './components/navbar';
+import { useAppDispatch, useAppSelector } from './app/hooks';
+import { fetchreadLaterFolder } from './features/readLaterFolder/readLaterFolderSlice';
+import { fetchBookmarks, selectAllBookmarks } from './features/bookmarks/bookmarksSlice';
+import { fetchOptions } from './features/options/optionsSlice';
+import BulkEditBookmarks from './features/bookmarks/bulkbookmarks';
+// import { IOptions, DEFAULT_SETTINGS } from '../../options/src/App';
 
-let readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null = null;
+// need to find a way to make single source of truth
+export type IOptions = {
+  defaultArchiveId: string;
+  openBookmarkInNewTab: boolean;
+  actionOnBookmarkClicked: string;
+};
+
+export const DEFAULT_SETTINGS = {
+  defaultArchiveId: '1',
+  openBookmarkInNewTab: false,
+  actionOnBookmarkClicked: 'none'
+};
 
 function App() {
-  const [newestFirst, setNewestFirst] = useState<boolean>(true);
-  const [bookmarks, setBookmarks] = useState<Array<chrome.bookmarks.BookmarkTreeNode>>([]);
+  const dispatch = useAppDispatch();
+  const bookmarksStatus = useAppSelector(state => state.bookmarks.status);
+  const bookmarks: Array<chrome.bookmarks.BookmarkTreeNode> = useAppSelector(selectAllBookmarks);
+  const readLaterFolderStatus = useAppSelector(state => state.readLaterFolder.status);
+  const optionsStatus = useAppSelector(state => state.options.status);
+  const options = useAppSelector(state => state.options.options);
+  const [newestFirst, setNewestFirst] = useState<boolean>(false);
+  const [bulkEdit, setBulkEdit] = useState<boolean>(false);
+  const [selectedBookmarks, setSelectedBookmarks] = useState<{ [key: string]: boolean }>({})
+
+  const toaster = useRef(null);
 
   useEffect(() => {
-    const findOrCreateReadLaterFolder = async () => {
-      const readLaterFolderSearchResult = await chrome.bookmarks.search("Read Later Bookmarks");
-      let readLaterFolder = null;
-      if (readLaterFolderSearchResult.length > 0) {
-        readLaterFolder = readLaterFolderSearchResult[0];
-      } else {
-        readLaterFolder = await chrome.bookmarks.create({ title: "Read Later Bookmarks" });
-      }
-      return readLaterFolder
+    chrome.bookmarks.onChanged.addListener(() => {
+      console.log("chrome.bookmarks.onChanged fired");
+      dispatch(fetchBookmarks());
+    });
+    chrome.bookmarks.onChildrenReordered.addListener(() => {
+      console.log("chrome.bookmarks.onChildrenReordered fired");
+      dispatch(fetchBookmarks());
+    });
+    chrome.bookmarks.onCreated.addListener(() => {
+      console.log("chrome.bookmarks.onCreated fired");
+      dispatch(fetchBookmarks());
+    });
+    chrome.bookmarks.onMoved.addListener(() => {
+      console.log("chrome.bookmarks.onMoved fired");
+      dispatch(fetchBookmarks());
+    });
+    chrome.bookmarks.onRemoved.addListener(() => {
+      console.log("chrome.bookmarks.onRemoved fired");
+      dispatch(fetchBookmarks());
+    });
+  }, [])
+
+  useEffect(() => {
+    if (readLaterFolderStatus === 'idle') {
+      dispatch(fetchreadLaterFolder());
+    }
+  }, [readLaterFolderStatus, dispatch]);
+
+  useEffect(() => {
+    if (bookmarksStatus === 'idle' && readLaterFolderStatus === 'succeeded') {
+      dispatch(fetchBookmarks());
+    }
+  }, [bookmarksStatus, readLaterFolderStatus, dispatch])
+
+  useEffect(() => {
+    if (optionsStatus === 'idle') {
+      dispatch(fetchOptions());
+    }
+
+    const handleStorageChange = (changes: object) => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+      dispatch(fetchOptions());
     };
 
-    const getBookmarks = async (folderId: string) => {
-      const folderChildrenResult = await chrome.bookmarks.getChildren(folderId);
-      console.log(folderChildrenResult);
-      setBookmarks(folderChildrenResult);
+    chrome.storage.onChanged.addListener(handleStorageChange);
+  }, [options, optionsStatus, dispatch]);
+
+  useEffect(() => {
+    for (const prop of Object.getOwnPropertyNames(selectedBookmarks)) {
+      delete selectedBookmarks[prop];
     }
-    findOrCreateReadLaterFolder()
-      .then(res => {
-        readLaterFolder = res;
-        getBookmarks(readLaterFolder.id);
-      })
-      .catch(console.error)
-  }, []);
-  
+    bookmarks.forEach((elem) => {
+      selectedBookmarks[elem.id] = false;
+    });
+  }, [bookmarks])
+
   return (
     <div className="App">
       <div className="container">
-        <ControlBar
+        <Nav
           newestFirst={newestFirst}
           setNewestFirst={setNewestFirst}
-          readLaterFolder={readLaterFolder}
+          bulkEdit={bulkEdit}
+          setBulkEdit={setBulkEdit}
+          toaster={toaster.current}
+          selectedBookmarks={selectedBookmarks}
+          setSelectedBookmarks={setSelectedBookmarks}
         />
-        <Bookmarks
-          readLaterFolder={readLaterFolder}
-          bookmarks={bookmarks}
-        />
+        {bulkEdit ? (
+          <BulkEditBookmarks
+            newestFirst={newestFirst}
+            toaster={toaster.current}
+            selectedBookmarks={selectedBookmarks}
+            setSelectedBookmarks={setSelectedBookmarks}
+          />
+        ) : (
+          <Bookmarks
+            newestFirst={newestFirst}
+            toaster={toaster.current}
+          />
+        )}
       </div>
+      <Toaster position={Position.BOTTOM_LEFT} ref={toaster} />
     </div>
   );
 }

@@ -5,7 +5,12 @@
   "manifest_version": 3,
   "permissions": [
     "bookmarks",
-    "tabs"
+    "tabs",
+    "storage",
+    "identity"
+  ],
+  "host_permissions": [
+    "*://*/*"
   ],
   "action": {
     "default_title": "Click to add page to read later bookmarks",
@@ -13,5 +18,6 @@
   },
   "background": {
     "service_worker": "background.js"
-  }
+  },
+  "options_page": "options/build/index.html"
 }

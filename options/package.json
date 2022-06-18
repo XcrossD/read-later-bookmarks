@@ -1,25 +1,22 @@
 {
-  "name": "readlater",
+  "name": "options",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@blueprintjs/core": "^4.4.0",
-    "@blueprintjs/icons": "^4.3.0",
-    "@blueprintjs/popover2": "^1.3.0",
-    "@reduxjs/toolkit": "^1.8.2",
+    "@blueprintjs/popover2": "^1.3.1",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.1",
-    "@types/node": "^16.11.36",
-    "@types/react": "^18.0.9",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.11.38",
+    "@types/react": "^18.0.10",
     "@types/react-dom": "^18.0.5",
     "crypto-js": "^4.1.1",
-    "moment": "^2.29.3",
+    "lodash-es": "^4.17.21",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "react-redux": "^8.0.2",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "typescript": "^4.7.2",
     "web-vitals": "^2.1.4"
   },
@@ -47,9 +44,10 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "readlater/build",
+  "homepage": "options/build",
   "devDependencies": {
     "@types/chrome": "^0.0.176",
-    "@types/crypto-js": "^4.1.1"
+    "@types/crypto-js": "^4.1.1",
+    "@types/lodash-es": "^4.17.6"
   }
 }
