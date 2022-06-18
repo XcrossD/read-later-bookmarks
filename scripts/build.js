@@ -39,7 +39,14 @@ const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 const isInteractive = process.stdout.isTTY;
 
 // Warn and crash if required files are missing
-if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+if (!checkRequiredFiles([
+  paths.readlaterHtml,
+  paths.readlaterIndexJs,
+  paths.optionsHtml,
+  paths.optionsIndexJs,
+  paths.popupHtml,
+  paths.popupIndexJs
+])) {
   process.exit(1);
 }
 
@@ -177,6 +184,7 @@ function build(previousFileSizes) {
         messages.warnings.length
       ) {
         // Ignore sourcemap warnings in CI builds. See #8227 for more info.
+        console.log('messages.warnings', messages.warnings);
         const filteredWarnings = messages.warnings.filter(
           w => !/Failed to parse source map/.test(w)
         );
@@ -212,6 +220,10 @@ function build(previousFileSizes) {
 function copyPublicFolder() {
   fs.copySync(paths.appPublic, paths.appBuild, {
     dereference: true,
-    filter: file => file !== paths.appHtml,
+    filter: (file) => {
+      return file !== paths.readlaterHtml ||
+        file !== paths.optionsHtml ||
+        file !== paths.popupHtml;
+    },
   });
 }

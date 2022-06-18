@@ -40,6 +40,7 @@
     "jest": "^27.4.3",
     "jest-resolve": "^27.4.2",
     "jest-watch-typeahead": "^1.0.0",
+    "lodash-es": "^4.17.21",
     "mini-css-extract-plugin": "^2.4.5",
     "moment": "^2.29.3",
     "postcss": "^8.4.4",
@@ -92,10 +93,11 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "readlater/build",
+  "homepage": "build",
   "devDependencies": {
     "@types/chrome": "^0.0.176",
-    "@types/crypto-js": "^4.1.1"
+    "@types/crypto-js": "^4.1.1",
+    "@types/lodash-es": "^4.17.6"
   },
   "jest": {
     "roots": [

@@ -14,10 +14,10 @@
   ],
   "action": {
     "default_title": "Click to add page to read later bookmarks",
-    "default_popup": "popup/build/index.html"
+    "default_popup": "build/popup.html"
   },
   "background": {
     "service_worker": "background.js"
   },
-  "options_page": "options/build/index.html"
+  "options_page": "build/options.html"
 }

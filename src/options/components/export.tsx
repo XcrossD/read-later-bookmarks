@@ -149,7 +149,7 @@ const ExportSettings = () => {
           })
         })
         const authorizeData = await authorizeResponse.text();
-        const matchArray: RegExpMatchArray = [...authorizeData.matchAll(re)][0];
+        const matchArray: RegExpMatchArray = authorizeData.matchAll(re).next().value;
         const newPocketData: IPocket = {
           access_token: String(matchArray[1]),
           username: decodeURIComponent(String(matchArray[2]))

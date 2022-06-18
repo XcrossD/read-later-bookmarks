@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import styled from "styled-components";
 import 'normalize.css/normalize.css';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
@@ -12,15 +11,6 @@ import {
   H3,
   H5
 } from '@blueprintjs/core';
-
-const SaveStateDisplay = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const OptionsDisplay = styled.div`
-  display: flex;
-`;
 
 let readLaterFolder: chrome.bookmarks.BookmarkTreeNode|null = null;
 
@@ -105,7 +95,7 @@ const App = () => {
   };
   
   const openReadLaterView = () => {
-    chrome.tabs.create({ 'url': 'readlater/build/index.html'});
+    chrome.tabs.create({ 'url': 'build/readlater.html'});
   };
 
   const openOptionsPage = () => {
@@ -115,7 +105,7 @@ const App = () => {
   return (
     <div className="App">
       <Card className="base-card">
-        <SaveStateDisplay>
+        <div className='save-state'>
           {
             pageInBookmarks ?
             <H3>Saved</H3> :
@@ -124,7 +114,7 @@ const App = () => {
           <H5 className="save-button-wrapper">
             <a href="" onClick={(e) => handleBookmarkAction(e)}>{pageInBookmarks ? 'Remove' : 'Save'}</a>
           </H5>
-        </SaveStateDisplay>
+        </div>
         <Divider />
         <ButtonGroup className="button-group">
           <Button

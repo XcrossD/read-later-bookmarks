@@ -200,7 +200,11 @@ module.exports = function (webpackEnv) {
       : isEnvDevelopment && 'cheap-module-source-map',
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
-    entry: paths.appIndexJs,
+    entry: {
+      readlater: paths.readlaterIndexJs,
+      options: paths.optionsIndexJs,
+      popup: paths.popupIndexJs,
+    },
     output: {
       // The build folder.
       path: paths.appBuild,
@@ -569,7 +573,63 @@ module.exports = function (webpackEnv) {
           {},
           {
             inject: true,
-            template: paths.appHtml,
+            template: paths.readlaterHtml,
+            chunks: ["readlater"],
+            filename: 'readlater.html'
+          },
+          isEnvProduction
+            ? {
+                minify: {
+                  removeComments: true,
+                  collapseWhitespace: true,
+                  removeRedundantAttributes: true,
+                  useShortDoctype: true,
+                  removeEmptyAttributes: true,
+                  removeStyleLinkTypeAttributes: true,
+                  keepClosingSlash: true,
+                  minifyJS: true,
+                  minifyCSS: true,
+                  minifyURLs: true,
+                },
+              }
+            : undefined
+        )
+      ),
+      new HtmlWebpackPlugin(
+        Object.assign(
+          {},
+          {
+            inject: true,
+            template: paths.optionsHtml,
+            chunks: ["options"],
+            filename: 'options.html'
+          },
+          isEnvProduction
+            ? {
+                minify: {
+                  removeComments: true,
+                  collapseWhitespace: true,
+                  removeRedundantAttributes: true,
+                  useShortDoctype: true,
+                  removeEmptyAttributes: true,
+                  removeStyleLinkTypeAttributes: true,
+                  keepClosingSlash: true,
+                  minifyJS: true,
+                  minifyCSS: true,
+                  minifyURLs: true,
+                },
+              }
+            : undefined
+        )
+      ),
+      new HtmlWebpackPlugin(
+        Object.assign(
+          {},
+          {
+            inject: true,
+            template: paths.popupHtml,
+            chunks: ["popup"],
+            filename: 'popup.html'
           },
           isEnvProduction
             ? {
@@ -642,9 +702,13 @@ module.exports = function (webpackEnv) {
             manifest[file.name] = file.path;
             return manifest;
           }, seed);
-          const entrypointFiles = entrypoints.main.filter(
-            fileName => !fileName.endsWith('.map')
-          );
+          const entrypointFiles = entrypoints.readlater.concat(
+            entrypoints.options,
+            entrypoints.popup
+          )
+            .filter(
+              fileName => !fileName.endsWith('.map')
+            );
 
           return {
             files: manifestFiles,

@@ -1,0 +1,22 @@
+.App {
+  text-align: center;
+}
+
+.base-card {
+  min-width: 300px;
+}
+
+.save-state {
+  display: flex;
+  justify-content: space-between;
+}
+
+.save-button-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-group {
+  margin-top: 10px;
+}
