@@ -159,7 +159,8 @@ _For more examples, please refer to the [Documentation](https://example.com)_
     - [x] Instapaper
 - [x] Bulk export
 - [ ] Tags
-- [ ] Combine folders
+- [x] Combine folders
+- [ ] Dev server
 
 See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
 
@@ -183,16 +184,14 @@ Don't forget to give the project a star! Thanks again!
 
 ### Installation
 
-Due to `create-react-app` being a single page application and chrome extension requiring multiple independent HTML files, currently the project is setup as one folder for each HTML file.
+~~Due to `create-react-app` being a single page application and chrome extension requiring multiple independent HTML files, currently the project is setup as one folder for each HTML file.~~
+
+It is now configured to use a single `package.json` file. Dev server is currently not supported.
 
 * npm
   ```sh
-  cd options
   npm install
-  cd ../popup
-  npm install
-  cd ../readlater
-  npm install
+  npm run build
   ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
