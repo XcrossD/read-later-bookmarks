@@ -12,7 +12,8 @@ chrome.runtime.onInstalled.addListener((details) => {
         chrome.storage.local.set({
           defaultArchiveId: '1',
           openBookmarkInNewTab: false,
-          actionOnBookmarkClicked: 'none'
+          actionOnBookmarkClicked: 'none',
+          defaultSort: 'oldest-first'
         })
         break;
      case 'update':

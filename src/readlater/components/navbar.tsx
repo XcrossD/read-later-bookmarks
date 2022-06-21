@@ -15,7 +15,7 @@ import {
 } from '@blueprintjs/core';
 import { Popover2 } from "@blueprintjs/popover2";
 import React from 'react';
-import { IOptions } from '../App';
+import { IOptions } from '../../options/App';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { selectAllBookmarks } from '../features/bookmarks/bookmarksSlice';
 import { updateSearchKeyword } from '../features/searchKeyword/searchKeywordSlice';

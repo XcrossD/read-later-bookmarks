@@ -2,7 +2,7 @@ import React from 'react';
 import { useAppSelector } from '../../app/hooks';
 import moment from 'moment';
 import { Button, ButtonGroup, Card, Classes, H5, IToastProps, NonIdealState, Toaster } from '@blueprintjs/core';
-import { IOptions } from '../../App';
+import { IOptions } from '../../../options/App';
 import { selectAllBookmarks } from './bookmarksSlice';
 import { BookmarkMeta, selectAllBookmarkMetas } from '../bookmarkMetas/bookmarkMetasSlice';
 import ExportButtonWithDialog from '../../components/exportdialog';

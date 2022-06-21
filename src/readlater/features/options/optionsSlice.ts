@@ -1,11 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { IOptions } from '../../App';
-
-export const DEFAULT_SETTINGS = {
-  defaultArchiveId: '1',
-  openBookmarkInNewTab: false,
-  actionOnBookmarkClicked: 'none'
-};
+import { IOptions, DEFAULT_SETTINGS } from '../../../options/App';
 
 interface OptionsState {
   options: IOptions;

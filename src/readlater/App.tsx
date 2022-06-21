@@ -15,20 +15,7 @@ import { fetchreadLaterFolder } from './features/readLaterFolder/readLaterFolder
 import { fetchBookmarks, selectAllBookmarks } from './features/bookmarks/bookmarksSlice';
 import { fetchOptions } from './features/options/optionsSlice';
 import BulkEditBookmarks from './features/bookmarks/bulkbookmarks';
-// import { IOptions, DEFAULT_SETTINGS } from '../../options/src/App';
-
-// need to find a way to make single source of truth
-export type IOptions = {
-  defaultArchiveId: string;
-  openBookmarkInNewTab: boolean;
-  actionOnBookmarkClicked: string;
-};
-
-export const DEFAULT_SETTINGS = {
-  defaultArchiveId: '1',
-  openBookmarkInNewTab: false,
-  actionOnBookmarkClicked: 'none'
-};
+import { DEFAULT_SETTINGS } from '../options/App';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -39,7 +26,8 @@ function App() {
   const options = useAppSelector(state => state.options.options);
   const [newestFirst, setNewestFirst] = useState<boolean>(false);
   const [bulkEdit, setBulkEdit] = useState<boolean>(false);
-  const [selectedBookmarks, setSelectedBookmarks] = useState<{ [key: string]: boolean }>({})
+  const [selectedBookmarks, setSelectedBookmarks] = useState<{ [key: string]: boolean }>({});
+  const [optionsLoaded, setOptionsLoaded] = useState<boolean>(false);
 
   const toaster = useRef(null);
 
@@ -79,17 +67,25 @@ function App() {
   }, [bookmarksStatus, readLaterFolderStatus, dispatch])
 
   useEffect(() => {
+    const handleStorageChange = (changes: object) => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+      if (Object.keys(changes).some(key => key in DEFAULT_SETTINGS)) {
+        dispatch(fetchOptions());
+      }
+    };
+    
     if (optionsStatus === 'idle') {
       dispatch(fetchOptions());
     }
-
-    const handleStorageChange = (changes: object) => {
-      chrome.storage.onChanged.removeListener(handleStorageChange);
-      dispatch(fetchOptions());
-    };
-
-    chrome.storage.onChanged.addListener(handleStorageChange);
+    if (optionsStatus === 'succeeded') {
+      setOptionsLoaded(true);
+      chrome.storage.onChanged.addListener(handleStorageChange);
+    }
   }, [options, optionsStatus, dispatch]);
+
+  useEffect(() => {
+    setNewestFirst(options.defaultSort === 'newest-first');
+  }, [optionsLoaded]);
 
   useEffect(() => {
     for (const prop of Object.getOwnPropertyNames(selectedBookmarks)) {

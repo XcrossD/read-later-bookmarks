@@ -14,12 +14,14 @@ export type IOptions = {
   defaultArchiveId: string;
   openBookmarkInNewTab: boolean;
   actionOnBookmarkClicked: string;
+  defaultSort: string;
 };
 
 export const DEFAULT_SETTINGS = {
   defaultArchiveId: '1',
   openBookmarkInNewTab: false,
-  actionOnBookmarkClicked: 'none'
+  actionOnBookmarkClicked: 'none',
+  defaultSort: 'oldest-first'
 };
 
 const OPEN_ACTIONS = [
@@ -28,48 +30,68 @@ const OPEN_ACTIONS = [
   { label: 'Archive bookmark after viewing', value: 'archive' }
 ];
 
+const SORT_OPTIONS = [
+  { label: 'Oldest first', value: 'oldest-first' },
+  { label: 'Newest first', value: 'newest-first' }
+];
+
 function App() {
   const [defaultArchiveFolder, setDefaultArchiveFolder] = useState<chrome.bookmarks.BookmarkTreeNode | null>(null);
-  const [openBookmarkInNewTab, setOpenBookmarkInNewTab] = useState<boolean>(false);
-  const [actionOnBookmarkClicked, setActionOnBookmarkClicked] = useState<string>('none');
+  const [openBookmarkInNewTab, setOpenBookmarkInNewTab] = useState<boolean>(DEFAULT_SETTINGS.openBookmarkInNewTab);
+  const [actionOnBookmarkClicked, setActionOnBookmarkClicked] = useState<string>(DEFAULT_SETTINGS.actionOnBookmarkClicked);
+  const [defaultSort, setDefaultSort] = useState<string>(DEFAULT_SETTINGS.defaultSort);
   
   useEffect(() => {
     const getAndSetFolder = async (id: string) => {
       const result = await chrome.bookmarks.get(id);
       setDefaultArchiveFolder(result[0]);
+    };
+
+    const setValueByKey = (key: string, value: IOptions[keyof IOptions]) => {
+      switch(key) {
+        case 'defaultArchiveId':
+          getAndSetFolder(value);
+          break;
+        case 'openBookmarkInNewTab':
+          setOpenBookmarkInNewTab(value);
+          break;
+        case 'actionOnBookmarkClicked':
+          setActionOnBookmarkClicked(value);
+          break;
+        case 'defaultSort':
+          setDefaultSort(value);
+          break;
+        default:
+          break;
+      }
     }
     
     chrome.storage.local.get(Object.keys(DEFAULT_SETTINGS), function(result) {
       // console.log("storage get result", result);
+      for (const [key, value] of Object.entries(result)) {
+        setValueByKey(key, value);
+      }
       if (Object.keys(result).length === 0) {
         chrome.storage.local.set(DEFAULT_SETTINGS, function() {
-          getAndSetFolder(DEFAULT_SETTINGS.defaultArchiveId);
-          setOpenBookmarkInNewTab(DEFAULT_SETTINGS.openBookmarkInNewTab);
-          setActionOnBookmarkClicked(DEFAULT_SETTINGS.actionOnBookmarkClicked);
+          for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
+            setValueByKey(key, value);
+          }
         });
-      } else {
-        getAndSetFolder(result.defaultArchiveId);
-        setOpenBookmarkInNewTab(result.openBookmarkInNewTab);
-        setActionOnBookmarkClicked(result.actionOnBookmarkClicked);
+      } else if (Object.keys(result).length !== Object.keys(DEFAULT_SETTINGS).length) {
+        for (let key of Object.keys(DEFAULT_SETTINGS)) {
+          if (!(key in result)) {
+            chrome.storage.local.set({[key]: DEFAULT_SETTINGS[key as keyof typeof DEFAULT_SETTINGS]}, function() {
+              setValueByKey(key, DEFAULT_SETTINGS[key as keyof typeof DEFAULT_SETTINGS]);
+            });
+          }
+        }
       }
     });
 
     chrome.storage.onChanged.addListener((changes) => {
       // console.log("changes", changes);
       for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-        switch(key) {
-          case 'defaultArchiveId':
-            getAndSetFolder(newValue);
-            break;
-          case 'openBookmarkInNewTab':
-            setOpenBookmarkInNewTab(newValue);
-            break;
-          case 'actionOnBookmarkClicked':
-            setActionOnBookmarkClicked(newValue);
-            break;
-          default:
-            break;
-        }
+        setValueByKey(key, newValue);
       }
     });
   }, []);
@@ -78,14 +100,21 @@ function App() {
     chrome.storage.local.set({
       openBookmarkInNewTab: !openBookmarkInNewTab,
     });
-  }
+  };
 
   const handlePostActionChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
     const action = e.currentTarget.value;
     chrome.storage.local.set({
       actionOnBookmarkClicked: action,
     });
-  }
+  };
+
+  const handleSortChange: React.ChangeEventHandler<HTMLSelectElement> = (e) => {
+    const sort = e.currentTarget.value;
+    chrome.storage.local.set({
+      defaultSort: sort,
+    });
+  };
   
   return (
     <div className="App">
@@ -122,6 +151,17 @@ function App() {
           options={OPEN_ACTIONS}
           value={actionOnBookmarkClicked}
           onChange={handlePostActionChange}  
+        />
+      </FormGroup>
+      <FormGroup
+        disabled={false}
+        inline={true}
+        label="Default sort"
+      >
+        <HTMLSelect
+          options={SORT_OPTIONS}
+          value={defaultSort}
+          onChange={handleSortChange}  
         />
       </FormGroup>
       <ExportSettings />
