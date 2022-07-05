@@ -6,6 +6,7 @@ import { IOptions } from '../../../options/App';
 import { selectAllBookmarks } from './bookmarksSlice';
 import { BookmarkMeta, selectAllBookmarkMetas } from '../bookmarkMetas/bookmarkMetasSlice';
 import ExportButtonWithDialog from '../../components/exportdialog';
+import BookmarkImage from './bookmarkImage';
 
 interface BookmarksProps {
   newestFirst: boolean;
@@ -114,10 +115,8 @@ const Bookmarks = (props: BookmarksProps) => {
               target={options.openBookmarkInNewTab ? "_blank" : "_self"}
               onClick={(e) => handleLinkClick(e, elem)}
             >
-              <img
-                className={metaLoaded ? "bookmark-card-image" : Classes.SKELETON}
-                src={metaLoaded ? changedbookmarkMetas[index].image || 'https://picsum.photos/200' : 'https://picsum.photos/200'}
-                alt={'Thumbnail'}
+              <BookmarkImage
+                imageSource={metaLoaded ? changedbookmarkMetas[index].image || '' : ''}
               />
             </a>
             <p>{dateAdded.format('MMM Do YYYY, h:mm:ss a')}</p>
