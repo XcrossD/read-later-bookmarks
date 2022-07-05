@@ -108,7 +108,7 @@ const Bookmarks = (props: BookmarksProps) => {
         const dateAdded = moment(elem.dateAdded),
           metaLoaded = bookmarkMetas.length === bookmarks.length;
         return (
-          <Card>
+          <Card key={elem.id}>
             <a
               href={elem.url}
               target={options.openBookmarkInNewTab ? "_blank" : "_self"}
