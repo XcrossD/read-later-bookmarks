@@ -7,7 +7,7 @@ import 'normalize.css/normalize.css';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import "@blueprintjs/popover2/lib/css/blueprint-popover2.css";
-import './App.css';
+import './App.scss';
 import Bookmarks from './features/bookmarks/bookmarks';
 import Nav from './components/navbar';
 import { useAppDispatch, useAppSelector } from './app/hooks';
