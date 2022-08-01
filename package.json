@@ -97,7 +97,8 @@
   "devDependencies": {
     "@types/chrome": "^0.0.176",
     "@types/crypto-js": "^4.1.1",
-    "@types/lodash-es": "^4.17.6"
+    "@types/lodash-es": "^4.17.6",
+    "sass": "^1.54.0"
   },
   "jest": {
     "roots": [
