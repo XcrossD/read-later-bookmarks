@@ -160,7 +160,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [x] Bulk export
 - [ ] Tags
 - [x] Combine folders
-- [ ] Dev server
+- [x] Dev server
 
 See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
 
@@ -210,7 +210,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Herbert Lin - [LinkedIn](https://www.linkedin.com/in/herbert-lin-28240446/) - herbert.lin.7@gmail.com
+Herbert Lin - readlaterbookmarks@gmail.com
 
 Project Link: [https://github.com/XcrossD/read-later-bookmarks](https://github.com/XcrossD/read-later-bookmarks)
 
